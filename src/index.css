@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --navy: #173642;
+    --ivory: #F6F2E9;
+    --sand: #EDE5D7;
+    --gold: #B79A62;
+    --teal: #397D80;
+    --charcoal: #22252A;
+    --white: #FFFFFF;
+  }
+
+  body {
+    font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+    background-color: #F6F2E9;
+    color: #173642;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, .font-serif-editorial {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+  }
+}
+
+.font-brand-marcellus {
+  font-family: 'Marcellus', 'Cormorant Garamond', Georgia, serif;
+}
+
+/* Gold Eyebrow Typography Styling */
+.eyebrow-gold {
+  color: #B79A62;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+}
+
+/* Thin Antique Gold Dividers */
+.gold-divider {
+  width: 3.5rem;
+  height: 1px;
+  background-color: #B79A62;
+  opacity: 0.7;
+}
+
+/* Slow Hero Image Animation */
+@keyframes heroScale {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-hero-slow {
+  animation: heroScale 28s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-slow {
+    animation: none;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F6F2E9;
+}
+::-webkit-scrollbar-thumb {
+  background: #B79A62;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #397D80;
+}

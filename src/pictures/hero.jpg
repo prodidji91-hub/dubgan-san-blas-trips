@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+    <defs>
+      <linearGradient id="heroSky" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#0B1D24"/>
+        <stop offset="30%" stop-color="#102B35"/>
+        <stop offset="65%" stop-color="#397D80"/>
+        <stop offset="85%" stop-color="#B79A62"/>
+        <stop offset="100%" stop-color="#F6F2E9"/>
+      </linearGradient>
+      <linearGradient id="heroSea" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#397D80"/>
+        <stop offset="35%" stop-color="#216D71"/>
+        <stop offset="70%" stop-color="#102B35"/>
+        <stop offset="100%" stop-color="#0A1C23"/>
+      </linearGradient>
+      <radialGradient id="sunGlowHero" cx="70%" cy="30%" r="45%">
+        <stop offset="0%" stop-color="#FFF5E0" stop-opacity="0.95"/>
+        <stop offset="25%" stop-color="#B79A62" stop-opacity="0.6"/>
+        <stop offset="60%" stop-color="#397D80" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#102B35" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="sandHero" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFFDF9"/>
+        <stop offset="60%" stop-color="#F6F2E9"/>
+        <stop offset="100%" stop-color="#E5D9C3"/>
+      </linearGradient>
+    </defs>
+
+    <rect width="1920" height="550" fill="url(#heroSky)"/>
+    <circle cx="1340" cy="300" r="380" fill="url(#sunGlowHero)"/>
+    <circle cx="1340" cy="300" r="65" fill="#FFFBF2"/>
+
+    <path d="M 120 540 Q 280 520 450 545 T 750 535 Q 900 520 1050 540 Z" fill="#102B35" opacity="0.75"/>
+    <path d="M 1150 545 Q 1300 530 1450 545 T 1750 540 Z" fill="#102B35" opacity="0.65"/>
+
+    <rect y="540" width="1920" height="540" fill="url(#heroSea)"/>
+
+    <ellipse cx="1340" cy="620" rx="320" ry="16" fill="#B79A62" opacity="0.4"/>
+    <ellipse cx="1340" cy="660" rx="240" ry="10" fill="#FFF5E0" opacity="0.5"/>
+
+    <path d="M 850 720 C 1050 660, 1500 680, 1720 780 C 1850 850, 1500 1080, 750 1080 Z" fill="url(#sandHero)"/>
+    
+    <path d="M 700 660 C 950 600, 1550 620, 1800 730 C 1950 820, 1600 1080, 600 1080 Z" fill="#397D80" opacity="0.4"/>
+
+    <path d="M 1250 760 Q 1200 630 1120 500" stroke="#102B35" stroke-width="24" stroke-linecap="round" fill="none"/>
+    <path d="M 1120 500 Q 1020 480 960 530" stroke="#397D80" stroke-width="14" stroke-linecap="round" fill="none"/>
+    <path d="M 1120 500 Q 1070 400 1000 380" stroke="#B79A62" stroke-width="14" stroke-linecap="round" fill="none"/>
+    <path d="M 1120 500 Q 1150 380 1200 360" stroke="#397D80" stroke-width="14" stroke-linecap="round" fill="none"/>
+
+    <path d="M 1380 770 Q 1420 640 1480 480" stroke="#102B35" stroke-width="20" stroke-linecap="round" fill="none"/>
+    <path d="M 1480 480 Q 1580 460 1640 510" stroke="#B79A62" stroke-width="12" stroke-linecap="round" fill="none"/>
+    <path d="M 1480 480 Q 1530 390 1580 370" stroke="#397D80" stroke-width="12" stroke-linecap="round" fill="none"/>
+
+    <polygon points="1220,740 1280,680 1340,740" fill="#B79A62"/>
+    <rect x="1240" y="740" width="80" height="40" fill="#102B35"/>
+
+    <rect width="900" height="1080" fill="url(#heroSky)" opacity="0.6"/>
+  </svg>

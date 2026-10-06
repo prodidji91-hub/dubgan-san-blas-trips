@@ -1,0 +1,6 @@
+{
+  "name": "Dubgan San Blas Trips - Viajes a Guna Yala",
+  "description": "Descubre las islas de Guna Yala / San Blas, Panamá con Dubgan San Blas Trips. Pasadías, estancias en islas, tours privados en barco y recorridos por Ciudad de Panamá.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

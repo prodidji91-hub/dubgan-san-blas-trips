@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+    <defs>
+      <linearGradient id="logoBg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#102B35"/>
+        <stop offset="100%" stop-color="#08181E"/>
+      </linearGradient>
+      <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#D4B982"/>
+        <stop offset="100%" stop-color="#B79A62"/>
+      </linearGradient>
+      <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#397D80"/>
+        <stop offset="100%" stop-color="#4E999C"/>
+      </linearGradient>
+    </defs>
+    <rect width="800" height="800" fill="#102B35"/>
+    <rect x="24" y="24" width="752" height="752" fill="none" stroke="url(#goldGrad)" stroke-width="4" rx="20"/>
+    <circle cx="400" cy="370" r="270" fill="url(#logoBg)" stroke="#B79A62" stroke-width="6"/>
+    
+    <circle cx="400" cy="310" r="110" fill="url(#goldGrad)" opacity="0.95"/>
+    <path d="M 220 420 Q 400 380 580 420 Q 480 460 320 460 Z" fill="#F6F2E9"/>
+    
+    <path d="M 330 420 Q 300 330 260 250" stroke="#102B35" stroke-width="12" stroke-linecap="round" fill="none"/>
+    <path d="M 260 250 Q 200 240 160 270" stroke="#397D80" stroke-width="6" fill="none"/>
+    <path d="M 260 250 Q 230 190 200 180" stroke="#B79A62" stroke-width="6" fill="none"/>
+    <path d="M 260 250 Q 300 200 330 220" stroke="#397D80" stroke-width="6" fill="none"/>
+    
+    <path d="M 460 420 Q 490 320 540 230" stroke="#102B35" stroke-width="14" stroke-linecap="round" fill="none"/>
+    <path d="M 540 230 Q 600 220 640 250" stroke="#B79A62" stroke-width="6" fill="none"/>
+    <path d="M 540 230 Q 570 170 600 170" stroke="#397D80" stroke-width="6" fill="none"/>
+
+    <path d="M 370 400 Q 400 415 430 400 L 420 412 Q 400 422 380 412 Z" fill="#B79A62"/>
+    <line x1="400" y1="402" x2="400" y2="340" stroke="#F6F2E9" stroke-width="3"/>
+    <path d="M 400 345 Q 425 370 400 395 Z" fill="#F6F2E9"/>
+
+    <path d="M 150 420 Q 275 460 400 420 T 650 420 C 690 510 690 570 650 610 C 500 650 300 650 150 610 Z" fill="url(#tealGrad)" opacity="0.85"/>
+
+    <text x="400" y="685" font-family="'Cormorant Garamond', serif" font-size="62" font-weight="700" fill="#F6F2E9" text-anchor="middle" letter-spacing="8">DUBGAN</text>
+    <text x="400" y="730" font-family="'Manrope', sans-serif" font-size="20" font-weight="600" fill="#B79A62" text-anchor="middle" letter-spacing="10">SAN BLAS TRIPS</text>
+    <text x="400" y="755" font-family="'Manrope', sans-serif" font-size="12" font-weight="500" fill="#397D80" text-anchor="middle" letter-spacing="4">GUNA YALA • PANAMA</text>
+  </svg>

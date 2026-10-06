@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 900" width="1920" height="900">
+    <defs>
+      <linearGradient id="storySunset" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#102B35"/>
+        <stop offset="35%" stop-color="#5C3B20"/>
+        <stop offset="65%" stop-color="#B79A62"/>
+        <stop offset="100%" stop-color="#397D80"/>
+      </linearGradient>
+    </defs>
+    <rect width="1920" height="900" fill="url(#storySunset)"/>
+    <circle cx="960" cy="420" r="220" fill="#FFF2D6" opacity="0.9"/>
+    
+    <rect y="500" width="1920" height="400" fill="#102B35"/>
+    <path d="M 600 520 L 1320 520 L 1220 580 L 700 580 Z" fill="#B79A62"/>
+    <line x1="960" y1="520" x2="960" y2="300" stroke="#F6F2E9" stroke-width="6"/>
+    <path d="M 960 310 Q 1060 410 960 510 Z" fill="#F6F2E9" opacity="0.85"/>
+
+    <text x="960" y="800" font-family="'Cormorant Garamond', serif" font-size="42" font-weight="700" fill="#F6F2E9" text-anchor="middle" letter-spacing="6">A MEANINGFUL EXPERIENCE IN GUNA YALA</text>
+  </svg>

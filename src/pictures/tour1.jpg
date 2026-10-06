@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+    <rect width="1200" height="450" fill="#397D80"/>
+    <rect y="450" width="1200" height="350" fill="#102B35"/>
+    <ellipse cx="600" cy="480" rx="480" ry="120" fill="#F6F2E9"/>
+    <ellipse cx="600" cy="480" rx="550" ry="160" fill="#397D80" opacity="0.4"/>
+    <path d="M 450 480 Q 420 320 350 220" stroke="#102B35" stroke-width="18" fill="none" stroke-linecap="round"/>
+    <path d="M 350 220 Q 250 200 200 250" stroke="#B79A62" stroke-width="10" fill="none"/>
+    <path d="M 350 220 Q 380 140 430 160" stroke="#397D80" stroke-width="10" fill="none"/>
+    <text x="600" y="720" font-family="'Cormorant Garamond', serif" font-size="36" font-weight="700" fill="#F6F2E9" text-anchor="middle" letter-spacing="4">ISLAND HOPPING TOUR</text>
+  </svg>

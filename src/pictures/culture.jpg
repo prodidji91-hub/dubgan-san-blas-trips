@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
+    <rect width="1200" height="900" fill="#102B35"/>
+    <rect x="60" y="60" width="1080" height="780" fill="none" stroke="#B79A62" stroke-width="8" rx="16"/>
+    <rect x="90" y="90" width="1020" height="720" fill="none" stroke="#397D80" stroke-width="4" rx="12"/>
+
+    <g transform="translate(600, 450)">
+      <path d="M -300 -200 L 300 -200 L 350 0 L 300 200 L -300 200 L -350 0 Z" fill="none" stroke="#C23B22" stroke-width="12"/>
+      <path d="M -260 -160 L 260 -160 L 300 0 L 260 160 L -260 160 L -300 0 Z" fill="none" stroke="#D49A3A" stroke-width="8"/>
+      <path d="M -220 -120 L 220 -120 L 250 0 L 220 120 L -220 120 L -250 0 Z" fill="none" stroke="#397D80" stroke-width="6"/>
+
+      <circle cx="0" cy="0" r="140" fill="#397D80" stroke="#B79A62" stroke-width="10"/>
+      <path d="M -90 0 Q 0 -110 90 0 Q 0 110 -90 0 Z" fill="#D96848"/>
+      <circle cx="0" cy="0" r="45" fill="#F6F2E9"/>
+
+      <path d="M -200 -90 L -140 -90 L -140 -40 L -180 -40 L -180 -10" fill="none" stroke="#F6F2E9" stroke-width="6" stroke-linecap="round"/>
+      <path d="M 200 -90 L 140 -90 L 140 -40 L 180 -40 L 180 -10" fill="none" stroke="#F6F2E9" stroke-width="6" stroke-linecap="round"/>
+      <path d="M -200 90 L -140 90 L -140 40 L -180 40 L -180 10" fill="none" stroke="#F6F2E9" stroke-width="6" stroke-linecap="round"/>
+      <path d="M 200 90 L 140 90 L 140 40 L 180 40 L 180 10" fill="none" stroke="#F6F2E9" stroke-width="6" stroke-linecap="round"/>
+    </g>
+
+    <text x="600" y="800" font-family="'Cormorant Garamond', serif" font-size="34" font-weight="700" fill="#F6F2E9" text-anchor="middle" letter-spacing="6">GUNA YALA TEXTILE ARTISTRY</text>
+  </svg>
