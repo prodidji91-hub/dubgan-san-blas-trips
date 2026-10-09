@@ -170,8 +170,20 @@ export const TripForm: React.FC<TripFormProps> = ({ currentLang }) => {
                       ? 'San Blas Private Full Day ($850 hasta 3 personas)'
                       : 'San Blas Private Full Day ($850 up to 3 people)'}
                   </option>
-                  <option value="San Blas Shared Full Day">
-                    {currentLang === 'es' ? 'Full Day en San Blas (Compartido)' : 'Full Day in San Blas (Shared)'}
+                  <option value="San Blas Shared Full Day ($135)">
+                    {currentLang === 'es'
+                      ? 'Full Day en San Blas - Compartido ($135 por persona)'
+                      : 'Full Day in San Blas - Shared ($135 per person)'}
+                  </option>
+                  <option value="Island Hopping — 2 Nights ($265)">
+                    {currentLang === 'es'
+                      ? 'Island Hopping — 2 noches ($265 por persona)'
+                      : 'Island Hopping — 2 Nights ($265 per person)'}
+                  </option>
+                  <option value="Island Hopping — 3 Nights ($355)">
+                    {currentLang === 'es'
+                      ? 'Island Hopping — 3 noches ($355 por persona)'
+                      : 'Island Hopping — 3 Nights ($355 per person)'}
                   </option>
                   <option value="General Inquiry">
                     {currentLang === 'es' ? 'Consulta General' : 'General Inquiry'}

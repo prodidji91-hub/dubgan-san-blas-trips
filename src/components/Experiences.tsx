@@ -29,6 +29,10 @@ export const Experiences: React.FC<ExperiencesProps> = ({ currentLang }) => {
     switch (key) {
       case 'tour2':
         return images.tours.tour2.src;
+      case 'aguja':
+        return images.aguja.src;
+      case 'chichime':
+        return images.chichime.src;
       case 'tour1':
       default:
         return images.tours.tour1.src;
@@ -63,15 +67,15 @@ export const Experiences: React.FC<ExperiencesProps> = ({ currentLang }) => {
           <div className="lg:col-span-5 text-sm sm:text-base text-[#173642]/80 font-normal leading-relaxed">
             <p>
               {currentLang === 'es'
-                ? 'Descubre nuestras experiencias oficiales en Guna Yala. Elige entre nuestro tour privado exclusivo de $850 (hasta 3 personas) o nuestro pasadía compartido.'
-                : 'Discover our official Guna Yala experiences. Choose between our exclusive $850 Private Experience (up to 3 guests) or our Shared Day Trip.'}
+                ? 'Descubre nuestras experiencias oficiales en Guna Yala. Elige entre nuestro tour privado exclusivo de $850 (hasta 3 personas), nuestro pasadía compartido de $135 por persona, o nuestros completos paquetes de hospedaje Island Hopping de 2 noches ($265 por persona) o 3 noches ($355 por persona).'
+                : 'Discover our official Guna Yala experiences. Choose between our exclusive $850 Private Experience (up to 3 guests), our Shared Day Trip for $135 per person, or our complete Island Hopping accommodation packages of 2 nights ($265 per person) or 3 nights ($355 per person).'}
             </p>
           </div>
 
         </div>
 
-        {/* 2-Column Responsive Layout for Private & Shared Tours */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+        {/* 2-Column Responsive Layout for Private, Shared & Overnight Tours */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
           {toursData.map((tour) => {
             const tourImg = getTourImage(tour.imageKey);
             const badgeText = currentLang === 'es' ? tour.badgeEs : tour.badgeEn;
