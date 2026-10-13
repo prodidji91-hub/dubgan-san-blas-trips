@@ -19,14 +19,30 @@ import { FAQSection } from './components/FAQSection';
 import { TripForm } from './components/TripForm';
 import { Footer } from './components/Footer';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
+import { AdminBookings } from './components/AdminBookings';
 import { Language } from './translations/content';
 
 export default function App() {
+  const isAdminRoute = window.location.pathname.startsWith('/admin');
+
+  if (isAdminRoute) {
+    return <AdminBookings />;
+  }
+
   const [currentLang, setCurrentLang] = useState<Language>('en');
+  const [selectedTourForBooking, setSelectedTourForBooking] = useState<string>('shared-full-day');
 
   const handleLanguageChange = (lang: Language) => {
     setCurrentLang(lang);
     document.documentElement.lang = lang;
+  };
+
+  const handleBookTour = (tourId: string) => {
+    setSelectedTourForBooking(tourId);
+    const target = document.querySelector('#contact');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -53,7 +69,7 @@ export default function App() {
         <MolaBorderLight />
 
         {/* 5. Experiences Section — Explore Our Tours (3-Column Luxury Cards) */}
-        <Experiences currentLang={currentLang} />
+        <Experiences currentLang={currentLang} onBookTour={handleBookTour} />
 
         {/* 6. Cinematic Storytelling Section (A Meaningful Experience) */}
         <Storytelling currentLang={currentLang} />
@@ -70,8 +86,12 @@ export default function App() {
         {/* 10. FAQ Section */}
         <FAQSection currentLang={currentLang} />
 
-        {/* 11. Plan Your Trip Form */}
-        <TripForm currentLang={currentLang} />
+        {/* 11. Plan Your Trip Form / Booking Request */}
+        <TripForm
+          currentLang={currentLang}
+          selectedTourId={selectedTourForBooking}
+          onTourChange={setSelectedTourForBooking}
+        />
       </main>
 
       {/* 12. Footer */}

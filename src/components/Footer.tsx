@@ -55,11 +55,11 @@ export const Footer: React.FC<FooterProps> = ({ currentLang }) => {
                     className="h-full w-auto object-contain"
                   />
                 </div>
-                <div className="flex flex-col justify-center">
-                  <span className="font-brand-marcellus font-medium text-2xl sm:text-3xl text-[#F6F2E9] tracking-wider leading-none">
-                    DUBGAN
+                <div className="flex flex-col justify-center select-none">
+                  <span className="font-brand-dubgan text-2xl sm:text-3xl font-semibold text-[#F6F2E9] leading-none tracking-[0.01em]">
+                    Dubgan
                   </span>
-                  <span className="text-[10px] font-semibold text-[#B79A62] tracking-[0.28em] uppercase mt-1">
+                  <span className="font-brand-subtitle text-[10px] font-medium text-[#B79A62] tracking-[0.14em] uppercase mt-1 leading-tight">
                     SAN BLAS TRIPS
                   </span>
                 </div>
@@ -118,25 +118,25 @@ export const Footer: React.FC<FooterProps> = ({ currentLang }) => {
               <div className="space-y-1">
                 <p className="text-xs text-[#F6F2E9]/60">{t.footer.phoneLabel}</p>
                 <a
-                  href="https://wa.me/50761436120"
+                  href="https://wa.me/50764217424"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 font-mono font-bold text-lg text-[#F6F2E9] hover:text-[#B79A62] transition-colors"
                 >
                   <Phone className="w-4 h-4 text-[#B79A62]" />
-                  <span>+507 6143-6120</span>
+                  <span>+507 6421-7424</span>
                 </a>
               </div>
 
               <div>
                 <a
-                  href="https://wa.me/50761436120"
+                  href="https://wa.me/50764217424"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] px-5 py-2.5 text-xs font-bold uppercase tracking-wider shadow"
                 >
                   <MessageCircle className="w-4 h-4 fill-[#173642]" />
-                  <span>WhatsApp: +507 6143-6120</span>
+                  <span>WhatsApp: +507 6421-7424</span>
                 </a>
               </div>
             </div>

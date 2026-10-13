@@ -84,7 +84,7 @@ export const Hero: React.FC<HeroProps> = ({ currentLang }) => {
 
             {/* Secondary Transparent WhatsApp CTA */}
             <a
-              href={`https://wa.me/50761436120?text=${defaultWhatsappMsg}`}
+              href={`https://wa.me/50764217424?text=${defaultWhatsappMsg}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-3 bg-transparent hover:bg-white/10 text-[#F6F2E9] border border-[#F6F2E9]/60 hover:border-[#F6F2E9] px-7 py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 backdrop-blur-xs"

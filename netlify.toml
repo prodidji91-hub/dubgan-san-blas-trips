@@ -1,0 +1,55 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[dev]
+  command = "npm run dev"
+  port = 3000
+  targetPort = 3000
+  publish = "dist"
+
+[[redirects]]
+  from = "/api/admin/auth"
+  to = "/.netlify/functions/admin-auth"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/bookings"
+  to = "/.netlify/functions/admin-bookings"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/approve-cabin"
+  to = "/.netlify/functions/admin-approve-cabin"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/decline-cabin"
+  to = "/.netlify/functions/admin-decline-cabin"
+  status = 200
+
+[[redirects]]
+  from = "/api/create-checkout"
+  to = "/.netlify/functions/create-checkout"
+  status = 200
+
+[[redirects]]
+  from = "/api/create-cabin-request"
+  to = "/.netlify/functions/create-cabin-request"
+  status = 200
+
+[[redirects]]
+  from = "/api/paguelofacil-webhook"
+  to = "/.netlify/functions/paguelofacil-webhook"
+  status = 200
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

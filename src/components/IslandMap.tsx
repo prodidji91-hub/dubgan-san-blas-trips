@@ -115,7 +115,7 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
       currentLang === 'es'
         ? `Hola Dubgan San Blas Trips, me gustaría consultar información y visitas a: ${islandName}.`
         : `Hello Dubgan San Blas Trips, I would like to inquire about visiting: ${islandName}.`;
-    return `https://wa.me/50761436120?text=${encodeURIComponent(message)}`;
+    return `https://wa.me/50764217424?text=${encodeURIComponent(message)}`;
   };
 
   return (

@@ -8,7 +8,8 @@ import {
   ShieldCheck,
   AlertCircle,
   Info,
-  Briefcase
+  Briefcase,
+  Calendar
 } from 'lucide-react';
 import { images } from '../pictures/images';
 import { Language, content } from '../translations/content';
@@ -19,9 +20,10 @@ import { MolaBorderDark } from './MolaBorderDark';
 
 interface ExperiencesProps {
   currentLang: Language;
+  onBookTour?: (tourId: string) => void;
 }
 
-export const Experiences: React.FC<ExperiencesProps> = ({ currentLang }) => {
+export const Experiences: React.FC<ExperiencesProps> = ({ currentLang, onBookTour }) => {
   const [selectedTour, setSelectedTour] = useState<TourDetail | null>(null);
   const t = content[currentLang];
 
@@ -41,7 +43,7 @@ export const Experiences: React.FC<ExperiencesProps> = ({ currentLang }) => {
 
   const getWhatsAppLink = (tour: TourDetail) => {
     const text = currentLang === 'es' ? tour.whatsappMessageEs : tour.whatsappMessageEn;
-    return `https://wa.me/50761436120?text=${encodeURIComponent(text)}`;
+    return `https://wa.me/50764217424?text=${encodeURIComponent(text)}`;
   };
 
   return (
@@ -154,26 +156,32 @@ export const Experiences: React.FC<ExperiencesProps> = ({ currentLang }) => {
                 </div>
 
                 {/* Footer CTA Buttons */}
-                <div className="p-6 sm:p-8 pt-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-t border-[#EDE5D7] mt-6 pt-6">
+                <div className="p-6 sm:p-8 pt-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-[#EDE5D7] mt-6 pt-6">
                   
                   <button
                     type="button"
+                    onClick={() => {
+                      if (onBookTour) {
+                        onBookTour(tour.id);
+                      } else {
+                        const target = document.querySelector('#contact');
+                        if (target) target.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}
+                    className="inline-flex items-center justify-center gap-2 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] px-6 py-3.5 text-xs font-bold uppercase tracking-wider transition-colors shadow"
+                  >
+                    <Calendar className="w-4 h-4 text-[#173642]" />
+                    <span>{currentLang === 'es' ? 'SOLICITAR RESERVA' : 'REQUEST BOOKING'}</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => setSelectedTour(tour)}
-                    className="inline-flex items-center justify-center gap-2 bg-[#173642] hover:bg-[#397D80] text-[#F6F2E9] px-6 py-3.5 text-xs font-bold uppercase tracking-wider transition-colors shadow"
+                    className="inline-flex items-center justify-center gap-2 bg-[#173642] hover:bg-[#397D80] text-[#F6F2E9] px-5 py-3.5 text-xs font-bold uppercase tracking-wider transition-colors shadow"
                   >
                     <Info className="w-4 h-4 text-[#B79A62]" />
                     <span>{currentLang === 'es' ? 'VER TOUR DETALLADO' : 'VIEW TOUR DETAILS'}</span>
                   </button>
-
-                  <a
-                    href={getWhatsAppLink(tour)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] px-6 py-3.5 text-xs font-bold uppercase tracking-wider transition-colors shadow"
-                  >
-                    <MessageCircle className="w-4 h-4 fill-[#173642]" />
-                    <span>{currentLang === 'es' ? 'CONSULTAR POR WHATSAPP' : 'INQUIRE ON WHATSAPP'}</span>
-                  </a>
 
                 </div>
 
@@ -409,25 +417,45 @@ export const Experiences: React.FC<ExperiencesProps> = ({ currentLang }) => {
             <MolaBorderDark />
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const tourId = selectedTour.id;
+                  setSelectedTour(null);
+                  if (onBookTour) {
+                    onBookTour(tourId);
+                  } else {
+                    const target = document.querySelector('#contact');
+                    if (target) target.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="flex-1 inline-flex items-center justify-center gap-2 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] py-4 px-6 text-xs font-bold uppercase tracking-widest transition-all shadow-md"
+              >
+                <Calendar className="w-4 h-4 text-[#173642]" />
+                <span>
+                  {currentLang === 'es'
+                    ? 'SOLICITAR RESERVA DE ESTE TOUR'
+                    : 'REQUEST BOOKING FOR THIS TOUR'}
+                </span>
+              </button>
+
               <a
                 href={getWhatsAppLink(selectedTour)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 inline-flex items-center justify-center gap-3 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] py-4 text-xs font-bold uppercase tracking-widest transition-all shadow-md"
+                className="inline-flex items-center justify-center gap-2 bg-[#173642] hover:bg-[#397D80] text-[#F6F2E9] py-4 px-5 text-xs font-bold uppercase tracking-widest transition-colors shadow"
               >
-                <MessageCircle className="w-4 h-4 fill-[#173642]" />
+                <MessageCircle className="w-4 h-4 text-[#B79A62]" />
                 <span>
-                  {currentLang === 'es'
-                    ? 'CONSULTAR DISPONIBILIDAD EN WHATSAPP'
-                    : 'INQUIRE AVAILABILITY ON WHATSAPP'}
+                  {currentLang === 'es' ? 'WHATSAPP' : 'WHATSAPP'}
                 </span>
               </a>
 
               <button
                 type="button"
                 onClick={() => setSelectedTour(null)}
-                className="px-6 py-4 bg-transparent hover:bg-[#173642]/10 text-[#173642] border border-[#173642]/30 text-xs font-bold uppercase tracking-widest transition-colors"
+                className="px-5 py-4 bg-transparent hover:bg-[#173642]/10 text-[#173642] border border-[#173642]/30 text-xs font-bold uppercase tracking-widest transition-colors"
               >
                 {currentLang === 'es' ? 'CERRAR' : 'CLOSE'}
               </button>

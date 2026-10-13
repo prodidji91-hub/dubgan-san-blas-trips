@@ -92,7 +92,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ currentLang }) => {
             </div>
 
             <a
-              href={`https://wa.me/50761436120?text=${defaultWhatsappMsg}`}
+              href={`https://wa.me/50764217424?text=${defaultWhatsappMsg}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#B79A62] hover:bg-[#a38752] text-[#102B35] px-8 py-4 text-xs font-bold uppercase tracking-widest transition-all duration-300 shadow-md shrink-0"

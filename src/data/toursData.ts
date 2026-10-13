@@ -120,22 +120,22 @@ export const toursData: TourDetail[] = [
     subtitleEn: 'Shared Day Trip',
     priceDisplayEs: '$135 USD por persona',
     priceDisplayEn: '$135 USD per person',
-    shortDescriptionEs: 'Un día completo explorando las joyas de San Blas. Incluye transporte terrestre compartido de ida y vuelta desde tu hotel en la Ciudad de Panamá, transporte en lancha durante el día, guía local indígena Guna, almuerzo con bebida y visitas guiadas a una comunidad, dos islas y la piscina natural.',
-    shortDescriptionEn: 'A full-day excursion exploring the gems of San Blas. Includes round-trip shared ground transportation from your hotel in Panama City, boat transportation during the day, a local Indigenous Guna guide, lunch with a drink, and guided visits to one community, two islands, and the natural pool.',
-    fullDescriptionEs: 'Viaja junto a otros aventureros hacia el archipiélago de Guna Yala en un pasadía completamente organizado. Disfruta de transporte terrestre de ida y vuelta desde tu hotel, transporte en lancha durante el día, la compañía de un guía local indígena Guna, almuerzo con bebida y un recorrido para descubrir una comunidad indígena, dos islas de ensueño y la espectacular piscina natural.',
-    fullDescriptionEn: 'Travel alongside fellow adventurers to the spectacular Guna Yala archipelago on a fully organized day trip. Enjoy convenient round-trip ground transportation from your hotel, boat transportation during the day, a local Indigenous Guna guide, lunch with a drink, and a curated tour visiting one Indigenous community, two dream islands, and the breathtaking natural pool.',
+    shortDescriptionEs: 'Un día completo explorando las joyas de San Blas. Incluye transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, transporte marítimo en lancha compartida, guía local indígena Guna, almuerzo con bebida y visitas guiadas a una comunidad, dos islas y la piscina natural.',
+    shortDescriptionEn: 'A full-day excursion exploring the gems of San Blas. Includes round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, shared boat transportation, a local Indigenous Guna guide, lunch with a drink, and guided visits to one community, two islands, and the natural pool.',
+    fullDescriptionEs: 'Viaja junto a otros aventureros hacia el archipiélago de Guna Yala en un pasadía completamente organizado. Disfruta de transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, transporte marítimo en lancha compartida, la compañía de un guía local indígena Guna, almuerzo con bebida y un recorrido para descubrir una comunidad indígena, dos islas de ensueño y la espectacular piscina natural.',
+    fullDescriptionEn: 'Travel alongside fellow adventurers to the spectacular Guna Yala archipelago on a fully organized day trip. Enjoy round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, shared boat transportation, a local Indigenous Guna guide, lunch with a drink, and a curated tour visiting one Indigenous community, two dream islands, and the breathtaking natural pool.',
     imageKey: 'tour1', // Chichime & Diablo photo
     inclusionsEs: [
-      'Transporte terrestre de ida y vuelta desde tu hotel en la Ciudad de Panamá.',
-      'Transporte marítimo en lancha durante el día.',
+      'Transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros.',
+      'Transporte marítimo en lancha compartida.',
       'Guía local indígena Guna.',
       'Almuerzo con una bebida.',
       'Visitas a cuatro lugares: una comunidad, dos islas y la piscina natural.',
       'Chaleco salvavidas y equipo de primeros auxilios.'
     ],
     inclusionsEn: [
-      'Round-trip ground transportation from the guest’s hotel in Panama City.',
-      'Boat transportation during the day.',
+      'Round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers.',
+      'Shared boat transportation.',
       'Local Indigenous Guna guide.',
       'Lunch with a drink.',
       'Visits to four places: one community, two islands, and the natural pool.',
@@ -150,12 +150,12 @@ export const toursData: TourDetail[] = [
       'Additional beverages and beer are NOT included.'
     ],
     importantInfoEs: [
-      'Capacidad de transporte: Vehículo 4x4 compartido y lancha segura.',
+      'Capacidad y Servicios de Transporte: Transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, y transporte marítimo en lancha compartida.',
       'Almuerzo: Incluye plato fresco y una bebida.',
       'Impuestos: El pago de entrada a la comarca debe realizarse en efectivo en la frontera.'
     ],
     importantInfoEn: [
-      'Transport Capacity: Shared 4x4 vehicle and safe speedboat.',
+      'Transport Capacity & Services: Round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, and shared boat transportation.',
       'Lunch: Freshly prepared meal and one drink included.',
       'Taxes: Comarca entry taxes must be paid in cash at the border.'
     ],
@@ -166,15 +166,15 @@ export const toursData: TourDetail[] = [
         time: 'Morning / Mañana',
         titleEs: 'Recogida en Ciudad de Panamá',
         titleEn: 'Panama City Pickup',
-        descriptionEs: 'Comenzamos el día temprano con transporte terrestre de ida y vuelta en un vehículo compartido directamente desde tu hotel en la Ciudad de Panamá.',
-        descriptionEn: 'We begin early with round-trip ground transportation in a shared vehicle directly from your hotel in Panama City.'
+        descriptionEs: 'Comenzamos el día temprano con transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, directamente desde tu hotel en la Ciudad de Panamá.',
+        descriptionEn: 'We begin early with round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, directly from your hotel in Panama City.'
       },
       {
         time: 'Morning / Mañana',
         titleEs: 'Embarque y Navegación',
         titleEn: 'Boarding & Speedboat Transit',
-        descriptionEs: 'Llegada al puerto de embarque. Con la asistencia de tu guía local indígena Guna, abordarás la lancha para iniciar la navegación a través de las hermosas aguas del Caribe.',
-        descriptionEn: 'Arrival at the port. Assisted by your local Indigenous Guna guide, you will board the boat to begin navigating the beautiful Caribbean waters.'
+        descriptionEs: 'Llegada al puerto de embarque. Con la asistencia de tu guía local indígena Guna, abordarás la lancha compartida para iniciar la navegación a través de las hermosas aguas del Caribe.',
+        descriptionEn: 'Arrival at the port. Assisted by your local Indigenous Guna guide, you will board the shared boat to begin navigating the beautiful Caribbean waters.'
       },
       {
         time: 'Midday / Mediodía',
@@ -199,8 +199,8 @@ export const toursData: TourDetail[] = [
         time: 'Afternoon / Tarde',
         titleEs: 'Retorno a la Ciudad de Panamá',
         titleEn: 'Return to Panama City',
-        descriptionEs: 'Abordamos la lancha de regreso al puerto. Desde allí, el transporte terrestre compartido te llevará de vuelta de forma segura y cómoda directamente hasta tu hotel en la Ciudad de Panamá.',
-        descriptionEn: 'We board the return boat to the port. From there, the shared ground transportation will take you safely and comfortably back to your hotel in Panama City.'
+        descriptionEs: 'Abordamos la lancha compartida de regreso al puerto. Desde allí, el transporte terrestre en camioneta 4×4 compartida con aire acondicionado (hasta 6 pasajeros) te llevará de vuelta de forma segura y cómoda directamente hasta tu hotel en la Ciudad de Panamá.',
+        descriptionEn: 'We board the shared return boat to the port. From there, the shared air-conditioned 4×4 ground transportation (up to 6 passengers) will take you safely and comfortably back to your hotel in Panama City.'
       }
     ]
   },
@@ -215,15 +215,15 @@ export const toursData: TourDetail[] = [
     subtitleEn: 'Island Accommodation Package',
     priceDisplayEs: '$265 USD por persona',
     priceDisplayEn: '$265 USD per person',
-    shortDescriptionEs: 'La experiencia caribeña definitiva en Guna Yala. Disfruta de 2 noches en cabañas privadas en Isla Aguja e Isla Chichime Chico, con transporte de ida y vuelta desde Ciudad de Panamá, recorridos guiados y alimentación completa incluida.',
-    shortDescriptionEn: 'The ultimate Caribbean experience in Guna Yala. Enjoy 2 nights in private cabins on Aguja Island and Chichime Chico Island, with round-trip transportation from Panama City, guided tours, and full meals included.',
-    fullDescriptionEs: 'Disfruta de una inolvidable estadía de 2 noches en las hermosas islas de Guna Yala. Te hospedarás en cabañas privadas en Isla Aguja e Isla Chichime Chico. Este paquete completamente organizado incluye traslados ida y vuelta en vehículo 4x4 con aire acondicionado, transporte en lancha entre islas durante tu estadía, un guía local indígena Guna, excursiones guiadas a dos islas y la piscina natural, y alimentación completa (6 comidas con bebidas).',
-    fullDescriptionEn: 'Enjoy an unforgettable 2-night stay in the beautiful islands of Guna Yala. You will stay in private cabins on Aguja Island and Chichime Chico Island. This fully organized package includes round-trip ground transportation from your Panama City hotel in an air-conditioned 4x4, boat transportation between islands during your stay, a local Indigenous Guna guide, guided excursions to two islands and the natural pool, and full board (6 meals with drinks).',
+    shortDescriptionEs: 'La experiencia caribeña definitiva en Guna Yala. Disfruta de 2 noches en cabañas privadas en Isla Aguja e Isla Chichime Chico, con transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, transporte marítimo en lancha compartida, recorridos guiados y alimentación completa incluida.',
+    shortDescriptionEn: 'The ultimate Caribbean experience in Guna Yala. Enjoy 2 nights in private cabins on Aguja Island and Chichime Chico Island, with round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, shared boat transportation, guided tours, and full meals included.',
+    fullDescriptionEs: 'Disfruta de una inolvidable estadía de 2 noches en las hermosas islas de Guna Yala. Te hospedarás en cabañas privadas en Isla Aguja e Isla Chichime Chico. Este paquete completamente organizado incluye transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, transporte marítimo en lancha compartida, un guía local indígena Guna, excursiones guiadas a dos islas y la piscina natural, y alimentación completa (6 comidas con bebidas).',
+    fullDescriptionEn: 'Enjoy an unforgettable 2-night stay in the beautiful islands of Guna Yala. You will stay in private cabins on Aguja Island and Chichime Chico Island. This fully organized package includes round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, shared boat transportation, a local Indigenous Guna guide, guided excursions to two islands and the natural pool, and full board (6 meals with drinks).',
     imageKey: 'aguja',
     inclusionsEs: [
       'Dos noches de hospedaje en cabaña (Isla Aguja: cabaña privada con baño privado; Isla Chichime Chico: cabaña privada frente a la playa con baño compartido).',
-      'Transporte terrestre de ida y vuelta en vehículo 4x4 con aire acondicionado desde tu hotel en la Ciudad de Panamá.',
-      'Transporte marítimo en lancha entre islas durante la estadía.',
+      'Transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros.',
+      'Transporte marítimo en lancha compartida.',
       'Guía local indígena Guna.',
       'Excursiones visitando dos islas y la piscina natural.',
       'Alimentación completa: 6 comidas con bebidas (2 desayunos, 2 almuerzos y 2 cenas).',
@@ -231,8 +231,8 @@ export const toursData: TourDetail[] = [
     ],
     inclusionsEn: [
       'Two nights of cabin accommodation (Isla Aguja: private cabin with private bathroom; Isla Chichime Chico: private beachfront cabin with shared bathroom).',
-      'Round-trip transportation in an air-conditioned 4x4 from the guest’s hotel in Panama City.',
-      'Boat transportation between islands during the stay.',
+      'Round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers.',
+      'Shared boat transportation.',
       'Local Indigenous Guna guide.',
       'Excursions visiting two islands and the natural pool.',
       'Six meals with drinks: two breakfasts, two lunches, and two dinners.',
@@ -266,13 +266,13 @@ export const toursData: TourDetail[] = [
       'Hospedaje Confirmado: Cabañas privadas en Isla Aguja (baño privado) e Isla Chichime Chico (baño compartido). Las islas de hospedaje están confirmadas, pero la asignación exacta de noches no está predeterminada.',
       'Opciones de Retorno (horarios de salida de la isla): Salida estándar a las 7:30 AM. Salida opcional por la tarde a las 3:00 PM (debe coordinarse el día anterior).',
       'Almuerzo de Salida por la Tarde: No está incluido en la tarifa base; tiene un costo adicional de $10 USD por persona (no incluye bebida).',
-      'Servicios de Transporte y Guía: Todos los transportes terrestres y marítimos, así como los recorridos y guías, se realizan en servicios de traslado estándar coordinados para su comodidad.'
+      'Servicios de Transporte: Transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, y transporte marítimo en lancha compartida.'
     ],
     importantInfoEn: [
       'Confirmed Accommodation: Private cabins on Isla Aguja (private bathroom) and Isla Chichime Chico (shared bathroom). Accommodation islands are confirmed, but the exact night allocation is not predetermined.',
       'Return Options (island departure times): Standard departure at 7:30 AM. Optional afternoon departure at 3:00 PM (must be arranged on the island the previous day).',
       'Afternoon Departure Lunch: Not included in the base rate; costs an additional $10 USD per person (without a drink).',
-      'Transportation & Excursions: All ground/maritime transfers, tours, and guides are conducted on a standard coordinated basis.'
+      'Transportation Services: Round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, and shared boat transportation.'
     ],
     whatsappMessageEs: 'Hola, quisiera información sobre el paquete de hospedaje Island Hopping de 2 Noches ($265 USD por persona).',
     whatsappMessageEn: 'Hello, I would like information about the Island Hopping 2-Nights accommodation package ($265 USD per person).',
@@ -281,22 +281,22 @@ export const toursData: TourDetail[] = [
         time: 'Day 1 / Día 1',
         titleEs: 'Llegada y Primera Isla de Hospedaje',
         titleEn: 'Arrival & First Accommodation Island',
-        descriptionEs: 'Transporte terrestre en vehículo 4x4 desde tu hotel en la Ciudad de Panamá hacia el puerto, seguido de traslado en lancha rápida hacia tu primera isla de estadía (Isla Aguja o Isla Chichime Chico). Almuerzo y cena incluidos con tiempo libre para disfrutar del paraíso caribeño.',
-        descriptionEn: '4x4 ground transportation from your Panama City hotel to the port, followed by speedboat transfer to your first island of stay (Isla Aguja or Isla Chichime Chico). Lunch and dinner are included, with free time to enjoy the Caribbean paradise.'
+        descriptionEs: 'Transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, desde tu hotel en la Ciudad de Panamá hacia el puerto, seguido de transporte marítimo en lancha compartida hacia tu primera isla de estadía (Isla Aguja o Isla Chichime Chico). Almuerzo y cena incluidos con tiempo libre para disfrutar del paraíso caribeño.',
+        descriptionEn: 'Round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, from your Panama City hotel to the port, followed by shared boat transportation to your first island of stay (Isla Aguja or Isla Chichime Chico). Lunch and dinner are included, with free time to enjoy the Caribbean paradise.'
       },
       {
         time: 'Day 2 / Día 2',
         titleEs: 'Excursión entre Islas y Segundo Hospedaje',
         titleEn: 'Island Exploration & Second Accommodation Island',
-        descriptionEs: 'Desayuno completo. Excursión marítima en lancha para visitar dos hermosas islas adicionales y nadar en la espectacular piscina natural de agua cristalina. Al finalizar, traslado a tu segunda isla de hospedaje para registrarte en tu cabaña privada. Almuerzo y cena incluidos.',
-        descriptionEn: 'Full breakfast. Speedboat tour visiting two gorgeous additional islands and swimming in the breathtaking natural pool. Afterward, transfer to your second island of stay to check in to your private cabin. Lunch and dinner are included.'
+        descriptionEs: 'Desayuno completo. Excursión marítima en lancha compartida para visitar dos hermosas islas adicionales y nadar en la espectacular piscina natural de agua cristalina. Al finalizar, traslado a tu segunda isla de hospedaje para registrarte en tu cabaña privada. Almuerzo y cena incluidos.',
+        descriptionEn: 'Full breakfast. Shared boat excursion visiting two gorgeous additional islands and swimming in the breathtaking natural pool. Afterward, transfer to your second island of stay to check in to your private cabin. Lunch and dinner are included.'
       },
       {
         time: 'Day 3 / Día 3',
         titleEs: 'Opciones de Retorno a Ciudad de Panamá',
         titleEn: 'Return Options to Panama City',
-        descriptionEs: 'Desayuno completo. Prepárate para el retorno según la opción elegida: salida estándar de la isla a las 7:30 AM, o salida opcional por la tarde a las 3:00 PM (coordinada el día anterior; almuerzo adicional de $10 USD por persona no incluido, sin bebida). Traslado en lancha y vehículo 4x4 de vuelta a tu hotel.',
-        descriptionEn: 'Full breakfast. Prepare for return based on your chosen option: standard island departure at 7:30 AM, or optional afternoon departure at 3:00 PM (must be arranged the day before; optional lunch available for $10 USD per person, without a drink). Speedboat and 4x4 transfer back to your hotel.'
+        descriptionEs: 'Desayuno completo. Prepárate para el retorno según la opción elegida: salida estándar de la isla a las 7:30 AM, o salida opcional por la tarde a las 3:00 PM (coordinada el día anterior; almuerzo adicional de $10 USD por persona no incluido, sin bebida). Traslado en lancha compartida y camioneta 4×4 compartida con aire acondicionado (hasta 6 pasajeros) de vuelta a tu hotel.',
+        descriptionEn: 'Full breakfast. Prepare for return based on your chosen option: standard island departure at 7:30 AM, or optional afternoon departure at 3:00 PM (must be arranged the day before; optional lunch available for $10 USD per person, without a drink). Return via shared boat transportation and shared air-conditioned 4×4 vehicle (up to 6 passengers) back to your hotel.'
       }
     ]
   },
@@ -311,15 +311,15 @@ export const toursData: TourDetail[] = [
     subtitleEn: 'Island Accommodation Package',
     priceDisplayEs: '$355 USD por persona',
     priceDisplayEn: '$355 USD per person',
-    shortDescriptionEs: 'La experiencia caribeña definitiva en Guna Yala. Disfruta de 3 noches en cabañas privadas en Isla Aguja, Isla Aroma e Isla Chichime Chico, con transporte de ida y vuelta desde Ciudad de Panamá, recorridos guiados y alimentación completa incluida.',
-    shortDescriptionEn: 'The ultimate Caribbean experience in Guna Yala. Enjoy 3 nights in private cabins on Aguja Island, Aroma Island, and Chichime Chico Island, with round-trip transportation from Panama City, guided tours, and full meals included.',
-    fullDescriptionEs: 'Disfruta de una maravillosa e inolvidable estadía de 3 noches en las hermosas islas de Guna Yala. Te hospedarás en cabañas privadas en Isla Aguja, Isla Aroma e Isla Chichime Chico. Este paquete completamente organizado incluye traslados de ida y vuelta desde tu hotel en la Ciudad de Panamá en un vehículo 4x4 con aire acondicionado, transporte marítimo en lancha entre islas durante tu estadía, la compañía de un guía local indígena Guna, excursiones guiadas visitando dos islas y la piscina de agua cristalina, y alimentación completa (desayunos, almuerzos y cenas con bebidas incluidas).',
-    fullDescriptionEn: 'Enjoy a wonderful and unforgettable 3-night stay in the beautiful islands of Guna Yala. You will stay in private cabins on Isla Aguja, Isla Aroma, and Isla Chichime Chico. This fully organized package includes round-trip ground transportation from your Panama City hotel in an air-conditioned 4x4, boat transportation between islands during your stay, a local Indigenous Guna guide, guided excursions visiting two islands and the natural pool, and full board (breakfasts, lunches, and dinners with drinks included).',
+    shortDescriptionEs: 'La experiencia caribeña definitiva en Guna Yala. Disfruta de 3 noches en cabañas privadas en Isla Aguja, Isla Aroma e Isla Chichime Chico, con transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, transporte marítimo en lancha compartida, recorridos guiados y alimentación completa incluida.',
+    shortDescriptionEn: 'The ultimate Caribbean experience in Guna Yala. Enjoy 3 nights in private cabins on Aguja Island, Aroma Island, and Chichime Chico Island, with round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, shared boat transportation, guided tours, and full meals included.',
+    fullDescriptionEs: 'Disfruta de una maravillosa e inolvidable estadía de 3 noches en las hermosas islas de Guna Yala. Te hospedarás en cabañas privadas en Isla Aguja, Isla Aroma e Isla Chichime Chico. Este paquete completamente organizado incluye transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, transporte marítimo en lancha compartida entre islas durante la estadía, la compañía de un guía local indígena Guna, excursiones guiadas visitando dos islas y la piscina de agua cristalina, y alimentación completa (desayunos, almuerzos y cenas con bebidas incluidas).',
+    fullDescriptionEn: 'Enjoy a wonderful and unforgettable 3-night stay in the beautiful islands of Guna Yala. You will stay in private cabins on Isla Aguja, Isla Aroma, and Isla Chichime Chico. This fully organized package includes round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, shared boat transportation between islands during the stay, a local Indigenous Guna guide, guided excursions visiting two islands and the natural pool, and full board (breakfasts, lunches, and dinners with drinks included).',
     imageKey: 'chichime',
     inclusionsEs: [
       'Tres noches de hospedaje en cabaña (Isla Aguja: cabaña privada con baño privado; Isla Aroma: cabaña privada con baño privado; Isla Chichime Chico: cabaña privada frente a la playa con baño compartido).',
-      'Transporte terrestre de ida y vuelta en vehículo 4x4 con aire acondicionado desde tu hotel en la Ciudad de Panamá.',
-      'Transporte marítimo en lancha entre islas durante la estadía.',
+      'Transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros.',
+      'Transporte marítimo en lancha compartida.',
       'Guía local indígena Guna.',
       'Excursiones visitando dos islas y la piscina natural.',
       'Alimentación completa: desayunos, almuerzos y cenas con bebidas incluidas.',
@@ -327,8 +327,8 @@ export const toursData: TourDetail[] = [
     ],
     inclusionsEn: [
       'Three nights of cabin accommodation (Isla Aguja: private cabin with private bathroom; Isla Aroma: private cabin with private bathroom; Isla Chichime Chico: private beachfront cabin with shared bathroom).',
-      'Round-trip transportation in an air-conditioned 4x4 from the guest’s hotel in Panama City.',
-      'Boat transportation between islands during the stay.',
+      'Round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers.',
+      'Shared boat transportation.',
       'Local Indigenous Guna guide.',
       'Excursions visiting two islands and the natural pool.',
       'Full board: breakfasts, lunches, and dinners with drinks included.',
@@ -362,13 +362,13 @@ export const toursData: TourDetail[] = [
       'Hospedaje Confirmado: Cabañas privadas en Isla Aguja (baño privado), Isla Aroma (baño privado) e Isla Chichime Chico (baño compartido). Las islas de hospedaje están confirmadas, pero la asignación exacta de noches, el orden de las islas o la elección de cabañas no están predeterminados.',
       'Opciones de Retorno (horarios de salida de la isla): Salida estándar a las 7:30 AM. Salida opcional por la tarde a las 3:00 PM (debe coordinarse el día anterior en la isla).',
       'Almuerzo de Salida por la Tarde: No está incluido en la tarifa base de hospedaje; tiene un costo adicional de $10 USD por persona (no incluye bebida).',
-      'Servicios de Transporte y Guía: Todos los transportes terrestres y marítimos, así como los recorridos y guías, se realizan en servicios de traslado estándar coordinados para su comodidad.'
+      'Servicios de Transporte: Transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, y transporte marítimo en lancha compartida.'
     ],
     importantInfoEn: [
       'Confirmed Accommodation: Private cabins on Isla Aguja (private bathroom), Isla Aroma (private bathroom), and Isla Chichime Chico (shared bathroom). Accommodation islands are confirmed, but the exact night allocation, order of islands, or accommodation choices are not predetermined.',
       'Return Options (island departure times): Standard departure at 7:30 AM. Optional afternoon departure at 3:00 PM (must be arranged on the island the previous day).',
       'Afternoon Departure Lunch: Not included in the base accommodation rate; costs an additional $10 USD per person (without a drink).',
-      'Transportation & Excursions: All ground/maritime transfers, tours, and guides are conducted on a standard coordinated basis.'
+      'Transportation Services: Round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, and shared boat transportation.'
     ],
     whatsappMessageEs: 'Hola, quisiera información sobre el paquete de hospedaje Island Hopping de 3 Noches ($355 USD por persona).',
     whatsappMessageEn: 'Hello, I would like information about the Island Hopping 3-Nights accommodation package ($355 USD per person).',
@@ -377,22 +377,22 @@ export const toursData: TourDetail[] = [
         time: 'Day 1 / Día 1',
         titleEs: 'Llegada y Primera Isla de Hospedaje',
         titleEn: 'Arrival & First Accommodation Island',
-        descriptionEs: 'Transporte terrestre en vehículo 4x4 desde tu hotel en la Ciudad de Panamá hacia el puerto, seguido de traslado en lancha rápida hacia tu primera isla de estadía (Isla Aguja, Isla Aroma o Isla Chichime Chico). Almuerzo y cena incluidos con tiempo libre.',
-        descriptionEn: '4x4 ground transportation from your Panama City hotel to the port, followed by speedboat transfer to your first island of stay (Isla Aguja, Isla Aroma, or Isla Chichime Chico). Lunch and dinner are included, with free time.'
+        descriptionEs: 'Transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, desde tu hotel en la Ciudad de Panamá hacia el puerto, seguido de transporte marítimo en lancha compartida hacia tu primera isla de estadía (Isla Aguja, Isla Aroma o Isla Chichime Chico). Almuerzo y cena incluidos con tiempo libre.',
+        descriptionEn: 'Round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, from your Panama City hotel to the port, followed by shared boat transportation to your first island of stay (Isla Aguja, Isla Aroma, or Isla Chichime Chico). Lunch and dinner are included, with free time.'
       },
       {
         time: 'Days 2 & 3 / Días 2 y 3',
         titleEs: 'Excursión entre Islas y Siguientes Hospedajes',
         titleEn: 'Island Exploration & Next Accommodation Islands',
-        descriptionEs: 'Desayuno completo. Excursión marítima en lancha para visitar dos hermosas islas adicionales y nadar en la piscina de agua cristalina. Registros en tus siguientes islas de hospedaje para descansar en tus cabañas privadas. Alimentación completa incluida.',
-        descriptionEn: 'Full breakfast. Speedboat tour visiting two gorgeous additional islands and swimming in the natural pool. Check-in at your next islands of stay to rest in your private cabins. Full board included.'
+        descriptionEs: 'Desayuno completo. Excursión marítima en lancha compartida para visitar dos hermosas islas adicionales y nadar en la piscina de agua cristalina. Registros en tus siguientes islas de hospedaje para descansar en tus cabañas privadas. Alimentación completa incluida.',
+        descriptionEn: 'Full breakfast. Shared boat excursion visiting two gorgeous additional islands and swimming in the natural pool. Check-in at your next islands of stay to rest in your private cabins. Full board included.'
       },
       {
         time: 'Day 4 / Día 4',
         titleEs: 'Opciones de Retorno a Ciudad de Panamá',
         titleEn: 'Return Options to Panama City',
-        descriptionEs: 'Desayuno completo. Regreso según la opción elegida: salida estándar de la isla a las 7:30 AM, o salida opcional por la tarde a las 3:00 PM (coordinada el día anterior en la isla; almuerzo adicional de $10 USD por persona no incluido, sin bebida). Traslado en lancha y vehículo 4x4 de vuelta a tu hotel.',
-        descriptionEn: 'Full breakfast. Return based on your chosen option: standard island departure at 7:30 AM, or optional afternoon departure at 3:00 PM (must be arranged the day before on the island; optional lunch available for $10 USD per person, without a drink). Speedboat and 4x4 transfer back to your hotel.'
+        descriptionEs: 'Desayuno completo. Regreso según la opción elegida: salida estándar de la isla a las 7:30 AM, o salida opcional por la tarde a las 3:00 PM (coordinada el día anterior en la isla; almuerzo adicional de $10 USD por persona no incluido, sin bebida). Traslado en lancha compartida y camioneta 4×4 compartida con aire acondicionado (hasta 6 pasajeros) de vuelta a tu hotel.',
+        descriptionEn: 'Full breakfast. Return based on your chosen option: standard island departure at 7:30 AM, or optional afternoon departure at 3:00 PM (must be arranged the day before on the island; optional lunch available for $10 USD per person, without a drink). Return via shared boat transportation and shared air-conditioned 4×4 vehicle (up to 6 passengers) back to your hotel.'
       }
     ]
   }

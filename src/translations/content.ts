@@ -90,18 +90,41 @@ export interface Translations {
     eyebrow: string;
     title: string;
     subtitle: string;
+    pagueloFacilNotice: string;
+    noChargeNotice: string;
     nameLabel: string;
     namePlaceholder: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    phoneLabel: string;
+    phonePlaceholder: string;
+    phoneHelp: string;
     dateLabel: string;
     datePlaceholder: string;
     travelersLabel: string;
     travelersPlaceholder: string;
+    hotelLabel: string;
+    hotelPlaceholder: string;
+    notBookedYet: string;
     tourLabel: string;
     tourDefault: string;
     messageLabel: string;
     messagePlaceholder: string;
+    summaryTitle: string;
+    summaryEstimatedTotal: string;
+    taxNotice: string;
+    privateMaxError: string;
     btnSubmit: string;
     notice: string;
+    // New dual flow fields
+    continueToPayment: string;
+    checkoutNotAvailableTitle: string;
+    checkoutNotAvailableDesc: string;
+    arrivalDateLabel: string;
+    departureDateLabel: string;
+    cabinApprovalNotice: string;
+    btnRequestCabinAvailability: string;
+    pressSendNotice: string;
   };
   footer: {
     tagline: string;
@@ -121,7 +144,7 @@ export const content: Record<Language, Translations> = {
       gunaYala: 'Guna Yala',
       about: 'About',
       contact: 'Contact',
-      whatsappPhone: '+507 6143-6120',
+      whatsappPhone: '+507 6421-7424',
     },
     hero: {
       eyebrow: 'DISCOVER',
@@ -197,7 +220,7 @@ export const content: Record<Language, Translations> = {
       description: 'Dubgan San Blas Trips is your direct contact for coordinating personalized island tours and getaways across Guna Yala.',
       boxTitle: 'How we coordinate your inquiry',
       boxText: 'Share your preferred travel dates, party size, and travel style. We will respond directly on WhatsApp with availability and guidance.',
-      ctaWhatsapp: 'Chat on WhatsApp (+507 6143-6120)',
+      ctaWhatsapp: 'Chat on WhatsApp (+507 6421-7424)',
     },
     gallerySection: {
       eyebrow: 'VISUAL INSPIRATION',
@@ -210,7 +233,7 @@ export const content: Record<Language, Translations> = {
       items: [
         {
           question: 'How do travelers reach the islands from Panama City?',
-          answer: 'Trips typically depart early in the morning from Panama City in 4x4 vehicles traversing the Guna Yala hills to the port, followed by a scenic boat ride to the islands.',
+          answer: 'For our shared tours and overnight packages, we provide round-trip ground transportation in a shared air-conditioned 4×4 vehicle, with up to 6 passengers, from Panama City to the port, followed by shared boat transportation to the islands. (Our private tour includes private ground and boat transportation).',
         },
         {
           question: 'What should visitors pack for an island excursion?',
@@ -227,21 +250,43 @@ export const content: Record<Language, Translations> = {
       ],
     },
     form: {
-      eyebrow: 'INQUIRE TODAY',
+      eyebrow: 'RESERVATION REQUEST',
       title: 'PLAN YOUR GUNA YALA TRIP',
-      subtitle: 'Fill in your trip details to generate a formatted WhatsApp message directly to Dubgan San Blas Trips.',
+      subtitle: 'Complete your trip details to request dates and accommodation availability with Dubgan San Blas Trips.',
+      pagueloFacilNotice: 'Send your request to check availability. Once your trip is confirmed as available, you will receive a secure PagueloFacil link to complete your payment and confirm your reservation.',
+      noChargeNotice: 'Submitting this request does NOT charge your card and does NOT create an automatic booking confirmation yet.',
       nameLabel: 'Full Name',
       namePlaceholder: 'e.g. Eleanor Vance',
-      dateLabel: 'Preferred Travel Date',
-      datePlaceholder: 'e.g. November 12th',
-      travelersLabel: 'Number of Travelers',
-      travelersPlaceholder: 'e.g. 2 guests',
-      tourLabel: 'Experience of Interest',
+      emailLabel: 'Email Address',
+      emailPlaceholder: 'e.g. eleanor@example.com',
+      phoneLabel: 'WhatsApp Number with Country Code',
+      phonePlaceholder: 'e.g. +1 555-0123 or +507 6421-7424',
+      phoneHelp: 'Include your international country dialing code (e.g. +1, +507, +34, +44).',
+      dateLabel: 'Preferred Tour Date',
+      datePlaceholder: 'Select date',
+      travelersLabel: 'Number of Guests',
+      travelersPlaceholder: '2',
+      hotelLabel: 'Pickup Hotel in Panama City',
+      hotelPlaceholder: 'e.g. Hotel Central Casco Antiguo',
+      notBookedYet: 'Not booked yet',
+      tourLabel: 'Selected Experience',
       tourDefault: 'Select an experience',
-      messageLabel: 'Additional Message or Questions',
-      messagePlaceholder: 'Share any preferences, dates, or questions...',
-      btnSubmit: 'SEND INQUIRY VIA WHATSAPP',
-      notice: 'This inquiry does not confirm a booking. Details and availability will be confirmed directly with you.',
+      messageLabel: 'Additional Message or Special Requests',
+      messagePlaceholder: 'Dietary preferences, arrival flight details, or questions...',
+      summaryTitle: 'Booking Summary',
+      summaryEstimatedTotal: 'Total (Full Amount)',
+      taxNotice: 'Guna Yala entry taxes not included: Foreigners $22 USD per person; Panamanians and residents $7 USD per person (mandatory cash payment at the border).',
+      privateMaxError: 'The private tour is limited to a maximum of 3 guests.',
+      btnSubmit: 'SUBMIT BOOKING REQUEST',
+      notice: 'Customers pay the full tour amount. Day trips proceed directly toward payment, while overnight cabin stays require availability approval first.',
+      continueToPayment: 'Continue to payment',
+      checkoutNotAvailableTitle: 'Online Checkout in Preparation',
+      checkoutNotAvailableDesc: 'Online checkout is not yet connected. Customers pay the full tour amount once checkout is active. Day trips cannot be paid online right now. To book this day trip today, contact Billy directly.',
+      arrivalDateLabel: 'Arrival Date',
+      departureDateLabel: 'Calculated Departure Date',
+      cabinApprovalNotice: 'Cabin availability must be confirmed before payment. Once approved, you will receive a secure link to pay the full amount.',
+      btnRequestCabinAvailability: 'Request cabin availability',
+      pressSendNotice: 'WhatsApp has opened with your inquiry pre-filled. You must press Send in WhatsApp for Billy to receive your request. Inquiries are not automatically saved on the website.',
     },
     footer: {
       tagline: 'Authentic cultural discovery combined with premium island travel in San Blas, Panama.',
@@ -259,7 +304,7 @@ export const content: Record<Language, Translations> = {
       gunaYala: 'Guna Yala',
       about: 'Nosotros',
       contact: 'Contacto',
-      whatsappPhone: '+507 6143-6120',
+      whatsappPhone: '+507 6421-7424',
     },
     hero: {
       eyebrow: 'DESCUBRE',
@@ -335,7 +380,7 @@ export const content: Record<Language, Translations> = {
       description: 'Dubgan San Blas Trips es tu contacto directo para coordinar tours insulares personalizados y escapadas a San Blas.',
       boxTitle: 'Cómo coordinamos tu consulta',
       boxText: 'Compártenos tus fechas preferidas, cantidad de viajeros y estilo de viaje. Te responderemos directamente por WhatsApp.',
-      ctaWhatsapp: 'Conversar por WhatsApp (+507 6143-6120)',
+      ctaWhatsapp: 'Conversar por WhatsApp (+507 6421-7424)',
     },
     gallerySection: {
       eyebrow: 'INSPIRACIÓN VISUAL',
@@ -348,7 +393,7 @@ export const content: Record<Language, Translations> = {
       items: [
         {
           question: '¿Cómo se llega a las islas desde Ciudad de Panamá?',
-          answer: 'Los viajes suelen salir temprano por la mañana desde Ciudad de Panamá en vehículos 4x4 cruzando la cordillera de Guna Yala hacia el puerto, seguido de un trayecto en bote hacia las islas.',
+          answer: 'Para nuestros tours compartidos y paquetes de hospedaje, incluimos transporte terrestre de ida y vuelta en camioneta 4×4 compartida con aire acondicionado, con capacidad de hasta 6 pasajeros, desde Ciudad de Panamá hacia el puerto, seguido de transporte marítimo en lancha compartida hacia las islas. (El tour privado incluye transporte terrestre y marítimo privado).',
         },
         {
           question: '¿Qué se recomienda empacar para una excursión insular?',
@@ -365,21 +410,43 @@ export const content: Record<Language, Translations> = {
       ],
     },
     form: {
-      eyebrow: 'CONSULTA HOY',
+      eyebrow: 'SOLICITUD DE RESERVA',
       title: 'PLANIFICA TU VIAJE A GUNA YALA',
-      subtitle: 'Llena tus datos para generar un mensaje de WhatsApp con formato directo para Dubgan San Blas Trips.',
+      subtitle: 'Completa los datos de tu viaje para verificar disponibilidad de fechas y cabañas con Dubgan San Blas Trips.',
+      pagueloFacilNotice: 'Envía tu solicitud para verificar disponibilidad. Una vez confirmada la disponibilidad de tu viaje, recibirás un enlace seguro de PagueloFacil para realizar tu pago y confirmar tu reserva.',
+      noChargeNotice: 'El envío de esta solicitud NO realiza ningún cargo a tu tarjeta ni genera una confirmación automática de reserva todavía.',
       nameLabel: 'Nombre y Apellido',
       namePlaceholder: 'Ej. Elena Vance',
-      dateLabel: 'Fecha Preferida de Viaje',
-      datePlaceholder: 'Ej. 12 de Noviembre',
+      emailLabel: 'Correo Electrónico',
+      emailPlaceholder: 'Ej. elena@ejemplo.com',
+      phoneLabel: 'Número de WhatsApp con Código de País',
+      phonePlaceholder: 'Ej. +507 6421-7424 o +34 612-345-678',
+      phoneHelp: 'Incluye el código internacional de país (ej. +507, +1, +34, +57).',
+      dateLabel: 'Fecha Preferida de Tour',
+      datePlaceholder: 'Selecciona la fecha',
       travelersLabel: 'Número de Viajeros',
-      travelersPlaceholder: 'Ej. 2 personas',
-      tourLabel: 'Experiencia de Interés',
+      travelersPlaceholder: '2',
+      hotelLabel: 'Hotel de Recogida en Ciudad de Panamá',
+      hotelPlaceholder: 'Ej. Hotel Central Casco Antiguo',
+      notBookedYet: 'Aún no reservado',
+      tourLabel: 'Experiencia Seleccionada',
       tourDefault: 'Selecciona una experiencia',
-      messageLabel: 'Mensaje o Preguntas Adicionales',
-      messagePlaceholder: 'Escribe aquí tus fechas o dudas...',
-      btnSubmit: 'ENVIAR CONSULTA POR WHATSAPP',
-      notice: 'Esta consulta no confirma una reserva. Los detalles y la disponibilidad se confirmarán directamente contigo.',
+      messageLabel: 'Mensaje o Peticiones Especiales (Opcional)',
+      messagePlaceholder: 'Preferencias de comida, hora de llegada de vuelo o preguntas...',
+      summaryTitle: 'Resumen de la Solicitud',
+      summaryEstimatedTotal: 'Total (Monto Completo)',
+      taxNotice: 'Impuestos de entrada a Guna Yala no incluidos: Extranjeros $22 USD por persona; Panameños y residentes $7 USD por persona (pago obligatorio en efectivo en la frontera).',
+      privateMaxError: 'El tour privado tiene un límite máximo de 3 personas.',
+      btnSubmit: 'ENVIAR SOLICITUD DE RESERVA',
+      notice: 'Los clientes pagan el monto total del tour. Los pasadías avanzan directamente hacia el pago, mientras que los paquetes de cabañas requieren aprobación previa de disponibilidad.',
+      continueToPayment: 'Continuar al pago',
+      checkoutNotAvailableTitle: 'Pago en Línea en Preparación',
+      checkoutNotAvailableDesc: 'El checkout en línea aún no está conectado. Los clientes pagan el monto completo del tour una vez activo el checkout. No es posible pagar pasadías en línea en este momento. Para reservar este pasadía hoy, contacta a Billy directamente.',
+      arrivalDateLabel: 'Fecha de llegada',
+      departureDateLabel: 'Fecha de salida calculada',
+      cabinApprovalNotice: 'La disponibilidad de las cabañas debe confirmarse antes del pago. Una vez aprobada, recibirás un enlace seguro para pagar el total.',
+      btnRequestCabinAvailability: 'Consultar disponibilidad de cabañas',
+      pressSendNotice: 'WhatsApp se ha abierto con tu consulta prellenada. Debes presionar Enviar en WhatsApp para que Billy reciba tu solicitud. Las consultas no se guardan automáticamente en el sitio web.',
     },
     footer: {
       tagline: 'Descubrimiento cultural auténtico combinado con viajes insulares de primera en San Blas, Panamá.',

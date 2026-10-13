@@ -15,7 +15,7 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ currentLang 
 
   return (
     <a
-      href={`https://wa.me/50761436120?text=${defaultMsg}`}
+      href={`https://wa.me/50764217424?text=${defaultMsg}`}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 bg-[#B79A62] hover:bg-[#a38752] text-[#102B35] px-4 py-3 rounded-none shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 border border-[#102B35]"
