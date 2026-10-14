@@ -3,7 +3,7 @@ import { MessageCircle, Phone } from 'lucide-react';
 import { images } from '../pictures/images';
 import { Language, content } from '../translations/content';
 import { MolaAccent } from './MolaAccent';
-import { MolaBorderLight } from './MolaBorderLight';
+import { MolaBorderDark } from './MolaBorderDark';
 
 interface FooterProps {
   currentLang: Language;
@@ -23,7 +23,7 @@ export const Footer: React.FC<FooterProps> = ({ currentLang }) => {
   return (
     <>
       {/* Light Cultural Border Divider Above Footer */}
-      <MolaBorderLight />
+      <MolaBorderDark />
 
       <footer className="bg-[#173642] text-[#F6F2E9] border-t border-[#B79A62]/40 pt-16 pb-12 relative overflow-hidden">
         

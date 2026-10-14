@@ -3,14 +3,13 @@ import React from 'react';
 export const MolaBorderDark: React.FC = () => {
   return (
     <div
-      className="w-full bg-[#0A1C23] relative overflow-hidden select-none py-0.5 border-y border-[#B79A62]/60 shadow-lg z-20"
+      className="w-full bg-[#142B42] relative overflow-hidden select-none py-0.5 border-y border-[#B79A62]/60 shadow-lg z-20"
       aria-hidden="true"
     >
       {/* 
         MolaBorderDark: Repeating Angular Rectangular Spiral Motif
-        Desktop height: ~50-60px, Mobile height: ~28-32px
-        Features crisp 90-degree turns and open interlocking rectangular spirals
-        Colors: Muted Gold (#B79A62), Coral/Terracotta (#D96848), Turquoise (#397D80), Deep Red (#C23B22), Navy (#0A1C23)
+        Standardized to match the approved homepage Header Mola frame color language & stroke styling.
+        Colors: Gold (#B79A62), Forest Green (#173B32), Deep Red (#A71920), Warm Ochre (#D38B25)
       */}
       <div className="h-[28px] sm:h-[45px] md:h-[58px] w-full flex items-center">
         <svg
@@ -29,34 +28,34 @@ export const MolaBorderDark: React.FC = () => {
               height="60"
               patternUnits="userSpaceOnUse"
             >
-              {/* Deep Navy Textile Background */}
-              <rect width="120" height="60" fill="#0A1C23" />
+              {/* Deep Navy Textile Background (#142B42) */}
+              <rect width="120" height="60" fill="#142B42" />
 
-              {/* MOTIF 1: Outer Angular Rectangular Spiral - Muted Gold (#B79A62) */}
+              {/* MOTIF 1: Outer Angular Rectangular Spiral - Deep Red (#A71920) */}
               <path
                 d="M 5,55 L 5,5 L 55,5 L 55,43 L 17,43 L 17,17 L 43,17 L 43,31 L 29,31 L 29,23 L 35,23"
-                stroke="#B79A62"
-                strokeWidth="2.5"
+                stroke="#A71920"
+                strokeWidth="2.2"
                 strokeLinecap="square"
                 strokeLinejoin="miter"
                 fill="none"
               />
 
-              {/* MOTIF 2: Interlocking Opposite Rectangular Spiral - Coral / Terracotta (#D96848) */}
+              {/* MOTIF 2: Interlocking Opposite Rectangular Spiral - Warm Ochre (#D38B25) */}
               <path
                 d="M 115,5 L 115,55 L 65,55 L 65,17 L 103,17 L 103,43 L 77,43 L 77,29 L 91,29 L 91,37 L 85,37"
-                stroke="#D96848"
-                strokeWidth="2.5"
+                stroke="#D38B25"
+                strokeWidth="2.2"
                 strokeLinecap="square"
                 strokeLinejoin="miter"
                 fill="none"
               />
 
-              {/* Inner Nested Accent Spiral - Turquoise (#397D80) */}
+              {/* Inner Nested Accent Spiral - Forest Green (#173B32) */}
               <path
                 d="M 11,49 L 11,11 L 49,11 L 49,37 L 23,37 L 23,23 L 37,23"
-                stroke="#397D80"
-                strokeWidth="1.8"
+                stroke="#173B32"
+                strokeWidth="1.6"
                 strokeLinecap="square"
                 strokeLinejoin="miter"
                 fill="none"
@@ -64,8 +63,8 @@ export const MolaBorderDark: React.FC = () => {
 
               <path
                 d="M 109,11 L 109,49 L 71,49 L 71,23 L 97,23 L 97,37 L 83,37"
-                stroke="#397D80"
-                strokeWidth="1.8"
+                stroke="#173B32"
+                strokeWidth="1.6"
                 strokeLinecap="square"
                 strokeLinejoin="miter"
                 fill="none"
@@ -77,8 +76,8 @@ export const MolaBorderDark: React.FC = () => {
                 y1="30"
                 x2="65"
                 y2="30"
-                stroke="#D49A3A"
-                strokeWidth="2.5"
+                stroke="#173B32"
+                strokeWidth="2.2"
                 strokeLinecap="square"
               />
               <line
@@ -86,8 +85,8 @@ export const MolaBorderDark: React.FC = () => {
                 y1="30"
                 x2="5"
                 y2="30"
-                stroke="#D49A3A"
-                strokeWidth="2.5"
+                stroke="#B79A62"
+                strokeWidth="2.2"
                 strokeLinecap="square"
               />
               <line
@@ -95,8 +94,8 @@ export const MolaBorderDark: React.FC = () => {
                 y1="30"
                 x2="120"
                 y2="30"
-                stroke="#D49A3A"
-                strokeWidth="2.5"
+                stroke="#B79A62"
+                strokeWidth="2.2"
                 strokeLinecap="square"
               />
             </pattern>

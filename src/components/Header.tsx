@@ -70,10 +70,10 @@ export const Header: React.FC<HeaderProps> = ({ currentLang, onLanguageChange })
                   xmlns="http://www.w3.org/2000/svg"
                   className="hidden sm:block w-full h-full"
                 >
-                  {/* Corner Inner Key Accent 1: Top-Left Ocean Turquoise (#397D80) */}
+                  {/* Corner Inner Key Accent 1: Top-Left Forest Green (#173B32) */}
                   <path
                     d="M 11,22 L 18,22 L 18,11"
-                    stroke="#397D80"
+                    stroke="#173B32"
                     strokeWidth="1.3"
                     strokeLinecap="square"
                     strokeLinejoin="miter"
@@ -81,10 +81,10 @@ export const Header: React.FC<HeaderProps> = ({ currentLang, onLanguageChange })
                     className="animate-mola-frame"
                   />
 
-                  {/* Corner Inner Key Accent 2: Top-Right Coral / Terracotta (#D96848) */}
+                  {/* Corner Inner Key Accent 2: Top-Right Deep Red (#A71920) */}
                   <path
                     d="M 82,11 L 82,22 L 89,22"
-                    stroke="#D96848"
+                    stroke="#A71920"
                     strokeWidth="1.3"
                     strokeLinecap="square"
                     strokeLinejoin="miter"
@@ -92,10 +92,10 @@ export const Header: React.FC<HeaderProps> = ({ currentLang, onLanguageChange })
                     className="animate-mola-frame"
                   />
 
-                  {/* Corner Inner Key Accent 3: Bottom-Right Ocean Turquoise (#397D80) */}
+                  {/* Corner Inner Key Accent 3: Bottom-Right Forest Green (#173B32) */}
                   <path
                     d="M 89,78 L 82,78 L 82,89"
-                    stroke="#397D80"
+                    stroke="#173B32"
                     strokeWidth="1.3"
                     strokeLinecap="square"
                     strokeLinejoin="miter"
@@ -103,10 +103,10 @@ export const Header: React.FC<HeaderProps> = ({ currentLang, onLanguageChange })
                     className="animate-mola-frame"
                   />
 
-                  {/* Corner Inner Key Accent 4: Bottom-Left Coral / Terracotta (#D96848) */}
+                  {/* Corner Inner Key Accent 4: Bottom-Left Warm Ochre (#D38B25) */}
                   <path
                     d="M 18,89 L 18,78 L 11,78"
-                    stroke="#D96848"
+                    stroke="#D38B25"
                     strokeWidth="1.3"
                     strokeLinecap="square"
                     strokeLinejoin="miter"

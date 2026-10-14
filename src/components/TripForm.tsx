@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { Language, content } from '../translations/content';
 import { MolaAccent } from './MolaAccent';
-import { MolaBorderLight } from './MolaBorderLight';
+import { MolaBorderDark } from './MolaBorderDark';
 
 interface TripFormProps {
   currentLang: Language;
@@ -429,7 +429,7 @@ export const TripForm: React.FC<TripFormProps> = ({
     <section id="contact" className="py-0 bg-[#F6F2E9] text-[#173642] relative scroll-mt-20">
       
       {/* Light Cultural Border Above Booking Section */}
-      <MolaBorderLight />
+      <MolaBorderDark />
 
       <div className="py-20 sm:py-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -1033,20 +1033,43 @@ export const TripForm: React.FC<TripFormProps> = ({
             <div className="bg-[#F6F2E9] max-w-lg w-full p-6 sm:p-8 shadow-2xl border-2 border-[#B79A62] text-[#173642] space-y-6 relative">
               
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-7 h-7 text-[#397D80] shrink-0 mt-1" />
+                <CheckCircle2 className="w-7 h-7 text-[#B79A62] shrink-0 mt-1" />
                 <div>
                   <h3 className="font-serif-editorial text-2xl font-bold text-[#173642]">
-                    {currentLang === 'es' ? 'Solicitud Guardada en Sistema' : 'Inquiry Saved in System'}
+                    {currentLang === 'es' ? 'Solicitud Recibida' : 'Request Received'}
                   </h3>
-                  <p className="text-xs text-[#173642]/80 mt-1 font-semibold">
+                  <p className="text-xs text-[#173642]/90 mt-1.5 leading-relaxed font-semibold">
                     {currentLang === 'es'
-                      ? 'Tu consulta de cabaña se registró exitosamente como "Pendiente de Disponibilidad".'
-                      : 'Your cabin inquiry was successfully saved as "Pending Availability".'}
+                      ? 'Hemos recibido tu solicitud de disponibilidad. Billy revisará las fechas solicitadas y se pondrá en contacto contigo para confirmar la disponibilidad. No es necesario realizar ningún pago por el momento.'
+                      : 'Your availability request has been received successfully. Billy will review your requested dates and contact you to confirm availability. No payment is required at this stage.'}
                   </p>
                 </div>
               </div>
 
               <div className="bg-white p-4 border border-[#B79A62]/40 space-y-2 text-xs">
+                <p className="font-bold text-[#B79A62]">
+                  {currentLang === 'es' ? 'Información importante:' : 'Important information:'}
+                </p>
+                <ul className="space-y-1 text-[#173642]/85 list-disc list-inside">
+                  <li>
+                    {currentLang === 'es'
+                      ? 'Tu solicitud de reserva ya está guardada de forma segura en nuestro sistema.'
+                      : 'Your reservation request is already safely saved in our system.'}
+                  </li>
+                  <li>
+                    {currentLang === 'es'
+                      ? 'WhatsApp es un método de comunicación opcional (no necesitas enviar otra solicitud).'
+                      : 'WhatsApp is an optional communication method (you do not need to send another request).'}
+                  </li>
+                  <li>
+                    {currentLang === 'es'
+                      ? 'La reserva no está confirmada hasta que Billy revise y confirme la disponibilidad.'
+                      : 'The reservation is not confirmed until availability has been reviewed and confirmed.'}
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-white p-3.5 border border-[#B79A62]/40 space-y-1.5 text-xs">
                 <p className="text-[#B79A62] font-mono font-bold">
                   <strong>{currentLang === 'es' ? 'Código de Reserva:' : 'Booking Reference:'}</strong> {whatsappModalData.bookingRef}
                 </p>
@@ -1058,17 +1081,6 @@ export const TripForm: React.FC<TripFormProps> = ({
                 <p><strong>{currentLang === 'es' ? 'Monto total:' : 'Full Amount:'}</strong> ${whatsappModalData.totalCalculated} USD</p>
               </div>
 
-              <div className="p-3.5 bg-[#173642] text-[#F6F2E9] text-xs space-y-1 border-l-4 border-[#B79A62]">
-                <p className="font-bold text-[#B79A62]">
-                  {currentLang === 'es' ? 'Paso Opcional — Contacto Directo:' : 'Optional Step — Direct Contact:'}
-                </p>
-                <p className="leading-relaxed">
-                  {currentLang === 'es'
-                    ? 'Tu reserva ya fue registrada en Netlify Blobs. Puedes presionar el botón abajo para enviar el mensaje con tu código de reserva a Billy por WhatsApp.'
-                    : 'Your booking has been saved in Netlify Blobs storage. You can click below to send the prefilled message with your reference code directly to Billy.'}
-                </p>
-              </div>
-
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
                 <a
                   href={whatsappModalData.whatsappUrl}
@@ -1077,7 +1089,7 @@ export const TripForm: React.FC<TripFormProps> = ({
                   className="flex-1 inline-flex items-center justify-center gap-2 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] py-3.5 px-4 text-xs font-bold uppercase tracking-wider transition-all shadow"
                 >
                   <MessageCircle className="w-4 h-4 fill-[#173642]" />
-                  <span>{currentLang === 'es' ? 'ABRIR EN WHATSAPP DE NUEVO' : 'OPEN IN WHATSAPP AGAIN'}</span>
+                  <span>{currentLang === 'es' ? 'Contactar a Billy por WhatsApp (Opcional)' : 'Contact Billy on WhatsApp (Optional)'}</span>
                 </a>
 
                 <button

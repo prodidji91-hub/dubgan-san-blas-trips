@@ -24,7 +24,7 @@ import {
   Info,
 } from 'lucide-react';
 import { MolaAccent } from './MolaAccent';
-import { MolaBorderLight } from './MolaBorderLight';
+import { MolaBorderDark } from './MolaBorderDark';
 
 interface BookingRecord {
   reference: string;
@@ -356,7 +356,7 @@ export const AdminBookings: React.FC = () => {
             </p>
           </div>
 
-          <MolaBorderLight />
+          <MolaBorderDark />
 
           {!isConfigured && (
             <div className="p-4 bg-[#D96848]/15 border-l-4 border-[#D96848] text-xs space-y-1">

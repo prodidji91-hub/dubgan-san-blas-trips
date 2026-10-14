@@ -2,7 +2,7 @@ import React from 'react';
 import { MessageCircle, Calendar, Users, Compass } from 'lucide-react';
 import { Language, content } from '../translations/content';
 import { MolaAccent } from './MolaAccent';
-import { MolaBorderLight } from './MolaBorderLight';
+import { MolaBorderDark } from './MolaBorderDark';
 
 interface AboutSectionProps {
   currentLang: Language;
@@ -39,7 +39,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ currentLang }) => {
           </div>
 
           {/* Light Ornamental Divider Below Intro Block */}
-          <MolaBorderLight />
+          <MolaBorderDark />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
             

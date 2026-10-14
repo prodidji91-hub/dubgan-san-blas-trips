@@ -3,7 +3,7 @@ import { MapPin, X, ArrowRight, Sparkles, Navigation, Info } from 'lucide-react'
 import { islandData, SAN_BLAS_PORT, IslandStatus } from '../data/islandData';
 import { Language, content } from '../translations/content';
 import { MolaAccent } from './MolaAccent';
-import { MolaBorderLight } from './MolaBorderLight';
+import { MolaBorderDark } from './MolaBorderDark';
 import { images } from '../pictures/images';
 
 interface IslandMapProps {
@@ -722,7 +722,7 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
 
       {/* Subtle Frame Divider */}
       <div className="mt-16">
-        <MolaBorderLight />
+        <MolaBorderDark />
       </div>
 
     </section>

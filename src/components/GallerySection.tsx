@@ -3,6 +3,7 @@ import { X, ChevronLeft, ChevronRight, ZoomIn, Compass, Sparkles } from 'lucide-
 import { images } from '../pictures/images';
 import { Language, content } from '../translations/content';
 import { MolaAccent } from './MolaAccent';
+import { MolaBorderDark } from './MolaBorderDark';
 
 interface GallerySectionProps {
   currentLang: Language;
@@ -105,50 +106,6 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ currentLang }) =
       id="gallery"
       className="relative bg-[#EDE5D7] text-[#173642] py-16 sm:py-20 lg:py-24 overflow-x-clip"
     >
-      {/* Embedded Mola Pattern Definitions matching Guna Yala textile borders */}
-      <svg className="sr-only" aria-hidden="true">
-        <defs>
-          <pattern
-            id="molaGalleryHorizPattern"
-            x="0"
-            y="0"
-            width="80"
-            height="14"
-            patternUnits="userSpaceOnUse"
-          >
-            <rect width="80" height="14" fill="#0A1C23" />
-            {/* Gold Outer Angular Spiral (#B79A62) */}
-            <path
-              d="M 3,13 L 3,1 L 37,1 L 38,10 L 10,10 L 10,4 L 28,4 L 28,7 L 18,7"
-              stroke="#B79A62"
-              strokeWidth="1.5"
-              strokeLinecap="square"
-              strokeLinejoin="miter"
-              fill="none"
-            />
-            {/* Coral Interlocking Spiral (#D96848) */}
-            <path
-              d="M 77,1 L 77,13 L 43,13 L 42,4 L 70,4 L 70,10 L 52,10 L 52,7 L 62,7"
-              stroke="#D96848"
-              strokeWidth="1.5"
-              strokeLinecap="square"
-              strokeLinejoin="miter"
-              fill="none"
-            />
-            {/* Turquoise Accent (#397D80) */}
-            <path
-              d="M 7,11 L 7,3 L 31,3 L 31,8 L 15,8"
-              stroke="#397D80"
-              strokeWidth="1.2"
-              strokeLinecap="square"
-              strokeLinejoin="miter"
-              fill="none"
-            />
-            <line x1="37" y1="7" x2="43" y2="7" stroke="#D49A3A" strokeWidth="1.5" strokeLinecap="square" />
-          </pattern>
-        </defs>
-      </svg>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
@@ -183,15 +140,8 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ currentLang }) =
         </div>
 
         {/* Top Decorative Mola Textile Accent Band */}
-        <div
-          className="w-full h-[14px] relative overflow-hidden select-none border-y border-[#B79A62]/70 rounded-t-lg mb-8 shadow-xs"
-          aria-hidden="true"
-        >
-          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 600 14">
-            <rect width="100%" height="14" fill="url(#molaGalleryHorizPattern)" />
-          </svg>
-          <div className="absolute top-0 inset-x-0 h-[1px] bg-[#B79A62] opacity-80" />
-          <div className="absolute bottom-0 inset-x-0 h-[1px] bg-[#B79A62] opacity-80" />
+        <div className="mb-8 rounded-t-lg overflow-hidden shadow-xs">
+          <MolaBorderDark />
         </div>
 
         {/* ============================================================ */}

@@ -15,7 +15,6 @@ import { images } from '../pictures/images';
 import { Language, content } from '../translations/content';
 import { toursData, TourDetail } from '../data/toursData';
 import { MolaAccent } from './MolaAccent';
-import { MolaBorderLight } from './MolaBorderLight';
 import { MolaBorderDark } from './MolaBorderDark';
 
 interface ExperiencesProps {
@@ -266,7 +265,7 @@ export const Experiences: React.FC<ExperiencesProps> = ({ currentLang, onBookTou
               />
             </div>
 
-            <MolaBorderLight />
+            <MolaBorderDark />
 
             {/* Full Narrative Description */}
             <p className="text-sm sm:text-base text-[#173642]/90 leading-relaxed font-normal">

@@ -3,7 +3,6 @@ import { Compass, Shield, Anchor } from 'lucide-react';
 import { Language, content } from '../translations/content';
 import { MolaAccent } from './MolaAccent';
 import { MolaBorderDark } from './MolaBorderDark';
-import { MolaBorderLight } from './MolaBorderLight';
 
 interface DestinationProps {
   currentLang: Language;
@@ -38,7 +37,7 @@ export const Destination: React.FC<DestinationProps> = ({ currentLang }) => {
 
       {/* Light Ornamental Border Below Header */}
       <div className="my-10">
-        <MolaBorderLight />
+        <MolaBorderDark />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
@@ -113,7 +112,7 @@ export const Destination: React.FC<DestinationProps> = ({ currentLang }) => {
 
       {/* Light Ornamental Border */}
       <div className="mt-12">
-        <MolaBorderLight />
+        <MolaBorderDark />
       </div>
 
     </section>
