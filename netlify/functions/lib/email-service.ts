@@ -1,6 +1,10 @@
 import nodemailer from 'nodemailer';
 import parsePhoneNumberFromString from 'libphonenumber-js';
-import { BookingRecord } from './booking-store.js';
+import {
+  BookingRecord,
+  updateBookingWithETag,
+  EmailLogEntry,
+} from './booking-store.js';
 
 function renderWhatsAppHtml(rawNumber?: string): string {
   if (!rawNumber) return 'N/A';
@@ -19,6 +23,9 @@ export interface EmailSendResult {
   messageId?: string;
   recipient: string;
   errorReason?: string;
+  errorCode?: string;
+  smtpResponseCode?: number | string;
+  smtpCommand?: string;
 }
 
 /**
@@ -35,13 +42,117 @@ export function escapeHtml(str: string | undefined): string {
 }
 
 /**
+ * Checks if external email sending is enabled via environment variable EMAIL_ENABLED.
+ * Handles trimmed case-insensitive values ('true', '1', 'yes', 'enabled'). Defaults to false.
+ */
+export function isEmailEnabled(): boolean {
+  const val = (process.env.EMAIL_ENABLED || '').trim().toLowerCase();
+  return val === 'true' || val === '1' || val === 'yes' || val === 'enabled';
+}
+
+/**
+ * Returns the presence of required email configuration as booleans only.
+ * Never exposes actual secrets, passwords, or emails.
+ */
+export function getSafeEmailConfigStatus() {
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_APP_PASSWORD;
+  const notifEmail = process.env.BOOKING_NOTIFICATION_EMAIL;
+  const siteUrl = process.env.SITE_URL || process.env.URL;
+
+  return {
+    emailEnabled: isEmailEnabled(),
+    hasSmtpUser: Boolean(smtpUser && smtpUser.trim()),
+    hasSmtpPass: Boolean(smtpPass && smtpPass.trim()),
+    hasNotificationEmail: Boolean(notifEmail && notifEmail.trim()),
+    hasSiteUrl: Boolean(siteUrl && siteUrl.trim()),
+  };
+}
+
+/**
+ * Logs structured diagnostic information about email delivery events safely.
+ * Never logs passwords, tokens, message bodies, full customer details, or raw SMTP traffic.
+ */
+export function logSafeEmailDiagnostic(data: {
+  event: 'send_attempt' | 'smtp_accepted' | 'smtp_rejected' | 'send_failed' | 'disabled_skipped';
+  reference: string;
+  notificationType: string;
+  messageId?: string;
+  errorCode?: string;
+  smtpResponseCode?: number | string;
+  smtpCommand?: string;
+  errorMessage?: string;
+}) {
+  const config = getSafeEmailConfigStatus();
+  console.log(
+    JSON.stringify({
+      tag: '[EMAIL_DIAGNOSTICS]',
+      timestamp: new Date().toISOString(),
+      event: data.event,
+      reference: data.reference,
+      notificationType: data.notificationType,
+      emailEnabled: config.emailEnabled,
+      configPresence: {
+        hasSmtpUser: config.hasSmtpUser,
+        hasSmtpPass: config.hasSmtpPass,
+        hasNotificationEmail: config.hasNotificationEmail,
+        hasSiteUrl: config.hasSiteUrl,
+      },
+      ...(data.messageId ? { messageId: data.messageId } : {}),
+      ...(data.errorCode ? { errorCode: data.errorCode } : {}),
+      ...(data.smtpResponseCode !== undefined ? { smtpResponseCode: data.smtpResponseCode } : {}),
+      ...(data.smtpCommand ? { smtpCommand: data.smtpCommand } : {}),
+      ...(data.errorMessage ? { errorMessage: data.errorMessage } : {}),
+    })
+  );
+}
+
+/**
+ * Extracts sanitized error details from an SMTP error object.
+ */
+export function extractSmtpErrorInfo(err: any): {
+  errorCode: string;
+  smtpResponseCode?: number | string;
+  smtpCommand?: string;
+  sanitizedMessage: string;
+} {
+  const errorCode = err?.code
+    ? String(err.code).slice(0, 50)
+    : err?.name
+    ? String(err.name).slice(0, 50)
+    : 'UNKNOWN_ERROR';
+  const smtpResponseCode =
+    err?.responseCode || (err?.response ? String(err.response).slice(0, 10) : undefined);
+  const smtpCommand = err?.command ? String(err.command).slice(0, 50) : undefined;
+
+  let sanitizedMessage = err?.message
+    ? String(err.message).replace(/[\r\n]+/g, ' ').slice(0, 250)
+    : 'Unknown error';
+
+  const secrets = [
+    process.env.SMTP_APP_PASSWORD,
+    process.env.ADMIN_PASSWORD,
+    process.env.PAGUELOFACIL_API_TOKEN,
+    process.env.PAGUELOFACIL_CCLW,
+  ];
+  for (const s of secrets) {
+    if (s && s.trim()) {
+      sanitizedMessage = sanitizedMessage.split(s.trim()).join('[REDACTED]');
+    }
+  }
+
+  return { errorCode, smtpResponseCode, smtpCommand, sanitizedMessage };
+}
+
+/**
  * Creates Nodemailer Transporter using Gmail SMTP credentials from server environment variables.
+ * Configured for smtp.gmail.com, port 465, secure TLS. Never disables certificate validation.
  */
 function createTransporter() {
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_APP_PASSWORD;
 
-  if (!smtpUser || !smtpPass) {
+  if (!smtpUser || !smtpPass || !smtpUser.trim() || !smtpPass.trim()) {
     return null;
   }
 
@@ -53,15 +164,13 @@ function createTransporter() {
       user: smtpUser.trim(),
       pass: smtpPass.trim(),
     },
+    tls: {
+      rejectUnauthorized: true, // Never disable certificate validation
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 5000,
+    socketTimeout: 10000,
   });
-}
-
-/**
- * Checks if external email sending is enabled via environment variable EMAIL_ENABLED.
- * Defaults to false for safe development.
- */
-export function isEmailEnabled(): boolean {
-  return process.env.EMAIL_ENABLED === 'true';
 }
 
 /**
@@ -81,11 +190,16 @@ function getRecipient(requestedRecipient: string): string {
 export async function sendCabinRequestBillyNotification(
   booking: BookingRecord
 ): Promise<EmailSendResult> {
-  const billyEmail = process.env.BOOKING_NOTIFICATION_EMAIL || 'victorinodio17@gmail.com';
+  const notificationType = 'billy_notification';
+  const billyEmail = (process.env.BOOKING_NOTIFICATION_EMAIL || 'victorinodio17@gmail.com').trim();
   const targetRecipient = getRecipient(billyEmail);
 
   if (!isEmailEnabled()) {
-    console.log(`[Email Service] EMAIL_ENABLED is false. Skipping Billy notification for ${booking.reference}`);
+    logSafeEmailDiagnostic({
+      event: 'disabled_skipped',
+      reference: booking.reference,
+      notificationType,
+    });
     return {
       success: true,
       disabled: true,
@@ -96,14 +210,22 @@ export async function sendCabinRequestBillyNotification(
 
   const transporter = createTransporter();
   if (!transporter) {
+    logSafeEmailDiagnostic({
+      event: 'send_failed',
+      reference: booking.reference,
+      notificationType,
+      errorCode: 'MISSING_SMTP_CREDENTIALS',
+      errorMessage: 'SMTP_USER or SMTP_APP_PASSWORD not set.',
+    });
     return {
       success: false,
       recipient: targetRecipient,
+      errorCode: 'MISSING_SMTP_CREDENTIALS',
       errorReason: 'MISSING_SMTP_CREDENTIALS: SMTP_USER or SMTP_APP_PASSWORD not set.',
     };
   }
 
-  const siteUrl = process.env.SITE_URL || 'https://dubgan.netlify.app';
+  const siteUrl = (process.env.SITE_URL || process.env.URL || 'https://dubgan.netlify.app').trim();
   const adminUrl = `${siteUrl.replace(/\/$/, '')}/admin/bookings`;
 
   const htmlContent = `
@@ -147,13 +269,45 @@ export async function sendCabinRequestBillyNotification(
     </html>
   `;
 
+  logSafeEmailDiagnostic({
+    event: 'send_attempt',
+    reference: booking.reference,
+    notificationType,
+  });
+
   try {
-    const smtpUser = process.env.SMTP_USER!;
+    const smtpUser = process.env.SMTP_USER!.trim();
     const info = await transporter.sendMail({
-      from: `"Dubgan San Blas Trips" <${smtpUser.trim()}>`,
+      from: `"Dubgan San Blas Trips" <${smtpUser}>`,
       to: targetRecipient,
       subject: `[NUEVA SOLICITUD DE CABAÑA] - Ref: ${booking.reference} (${booking.customer.fullName})`,
       html: htmlContent,
+    });
+
+    if (info.rejected && info.rejected.length > 0) {
+      logSafeEmailDiagnostic({
+        event: 'smtp_rejected',
+        reference: booking.reference,
+        notificationType,
+        messageId: info.messageId,
+        smtpResponseCode: info.response,
+        errorMessage: 'Recipient rejected by SMTP server.',
+      });
+      return {
+        success: false,
+        recipient: targetRecipient,
+        messageId: info.messageId,
+        errorCode: 'SMTP_REJECTED',
+        errorReason: 'Recipient rejected by SMTP server.',
+      };
+    }
+
+    logSafeEmailDiagnostic({
+      event: 'smtp_accepted',
+      reference: booking.reference,
+      notificationType,
+      messageId: info.messageId,
+      smtpResponseCode: info.response,
     });
 
     return {
@@ -162,11 +316,23 @@ export async function sendCabinRequestBillyNotification(
       messageId: info.messageId,
     };
   } catch (err: any) {
-    console.error(`[Email Service] Error sending Billy notification:`, err);
+    const errInfo = extractSmtpErrorInfo(err);
+    logSafeEmailDiagnostic({
+      event: 'send_failed',
+      reference: booking.reference,
+      notificationType,
+      errorCode: errInfo.errorCode,
+      smtpResponseCode: errInfo.smtpResponseCode,
+      smtpCommand: errInfo.smtpCommand,
+      errorMessage: errInfo.sanitizedMessage,
+    });
     return {
       success: false,
       recipient: targetRecipient,
-      errorReason: err?.message || String(err),
+      errorCode: errInfo.errorCode,
+      smtpResponseCode: errInfo.smtpResponseCode,
+      smtpCommand: errInfo.smtpCommand,
+      errorReason: errInfo.sanitizedMessage,
     };
   }
 }
@@ -177,10 +343,15 @@ export async function sendCabinRequestBillyNotification(
 export async function sendCabinRequestCustomerAcknowledgement(
   booking: BookingRecord
 ): Promise<EmailSendResult> {
+  const notificationType = 'customer_acknowledgement';
   const targetRecipient = getRecipient(booking.customer.email);
 
   if (!isEmailEnabled()) {
-    console.log(`[Email Service] EMAIL_ENABLED is false. Skipping customer acknowledgement for ${booking.reference}`);
+    logSafeEmailDiagnostic({
+      event: 'disabled_skipped',
+      reference: booking.reference,
+      notificationType,
+    });
     return {
       success: true,
       disabled: true,
@@ -191,9 +362,17 @@ export async function sendCabinRequestCustomerAcknowledgement(
 
   const transporter = createTransporter();
   if (!transporter) {
+    logSafeEmailDiagnostic({
+      event: 'send_failed',
+      reference: booking.reference,
+      notificationType,
+      errorCode: 'MISSING_SMTP_CREDENTIALS',
+      errorMessage: 'SMTP_USER or SMTP_APP_PASSWORD not set.',
+    });
     return {
       success: false,
       recipient: targetRecipient,
+      errorCode: 'MISSING_SMTP_CREDENTIALS',
       errorReason: 'MISSING_SMTP_CREDENTIALS: SMTP_USER or SMTP_APP_PASSWORD not set.',
     };
   }
@@ -268,13 +447,45 @@ export async function sendCabinRequestCustomerAcknowledgement(
     </html>
   `;
 
+  logSafeEmailDiagnostic({
+    event: 'send_attempt',
+    reference: booking.reference,
+    notificationType,
+  });
+
   try {
-    const smtpUser = process.env.SMTP_USER!;
+    const smtpUser = process.env.SMTP_USER!.trim();
     const info = await transporter.sendMail({
-      from: `"Dubgan San Blas Trips" <${smtpUser.trim()}>`,
+      from: `"Dubgan San Blas Trips" <${smtpUser}>`,
       to: targetRecipient,
       subject,
       html: htmlContent,
+    });
+
+    if (info.rejected && info.rejected.length > 0) {
+      logSafeEmailDiagnostic({
+        event: 'smtp_rejected',
+        reference: booking.reference,
+        notificationType,
+        messageId: info.messageId,
+        smtpResponseCode: info.response,
+        errorMessage: 'Recipient rejected by SMTP server.',
+      });
+      return {
+        success: false,
+        recipient: targetRecipient,
+        messageId: info.messageId,
+        errorCode: 'SMTP_REJECTED',
+        errorReason: 'Recipient rejected by SMTP server.',
+      };
+    }
+
+    logSafeEmailDiagnostic({
+      event: 'smtp_accepted',
+      reference: booking.reference,
+      notificationType,
+      messageId: info.messageId,
+      smtpResponseCode: info.response,
     });
 
     return {
@@ -283,11 +494,23 @@ export async function sendCabinRequestCustomerAcknowledgement(
       messageId: info.messageId,
     };
   } catch (err: any) {
-    console.error(`[Email Service] Error sending customer acknowledgement:`, err);
+    const errInfo = extractSmtpErrorInfo(err);
+    logSafeEmailDiagnostic({
+      event: 'send_failed',
+      reference: booking.reference,
+      notificationType,
+      errorCode: errInfo.errorCode,
+      smtpResponseCode: errInfo.smtpResponseCode,
+      smtpCommand: errInfo.smtpCommand,
+      errorMessage: errInfo.sanitizedMessage,
+    });
     return {
       success: false,
       recipient: targetRecipient,
-      errorReason: err?.message || String(err),
+      errorCode: errInfo.errorCode,
+      smtpResponseCode: errInfo.smtpResponseCode,
+      smtpCommand: errInfo.smtpCommand,
+      errorReason: errInfo.sanitizedMessage,
     };
   }
 }
@@ -298,10 +521,15 @@ export async function sendCabinRequestCustomerAcknowledgement(
 export async function sendCabinApprovalPaymentLink(
   booking: BookingRecord
 ): Promise<EmailSendResult> {
+  const notificationType = 'customer_payment_link';
   const targetRecipient = getRecipient(booking.customer.email);
 
   if (!isEmailEnabled()) {
-    console.log(`[Email Service] EMAIL_ENABLED is false. Skipping payment link email for ${booking.reference}`);
+    logSafeEmailDiagnostic({
+      event: 'disabled_skipped',
+      reference: booking.reference,
+      notificationType,
+    });
     return {
       success: true,
       disabled: true,
@@ -312,9 +540,17 @@ export async function sendCabinApprovalPaymentLink(
 
   const transporter = createTransporter();
   if (!transporter) {
+    logSafeEmailDiagnostic({
+      event: 'send_failed',
+      reference: booking.reference,
+      notificationType,
+      errorCode: 'MISSING_SMTP_CREDENTIALS',
+      errorMessage: 'SMTP_USER or SMTP_APP_PASSWORD not set.',
+    });
     return {
       success: false,
       recipient: targetRecipient,
+      errorCode: 'MISSING_SMTP_CREDENTIALS',
       errorReason: 'MISSING_SMTP_CREDENTIALS: SMTP_USER or SMTP_APP_PASSWORD not set.',
     };
   }
@@ -404,13 +640,45 @@ export async function sendCabinApprovalPaymentLink(
     </html>
   `;
 
+  logSafeEmailDiagnostic({
+    event: 'send_attempt',
+    reference: booking.reference,
+    notificationType,
+  });
+
   try {
-    const smtpUser = process.env.SMTP_USER!;
+    const smtpUser = process.env.SMTP_USER!.trim();
     const info = await transporter.sendMail({
-      from: `"Dubgan San Blas Trips" <${smtpUser.trim()}>`,
+      from: `"Dubgan San Blas Trips" <${smtpUser}>`,
       to: targetRecipient,
       subject,
       html: htmlContent,
+    });
+
+    if (info.rejected && info.rejected.length > 0) {
+      logSafeEmailDiagnostic({
+        event: 'smtp_rejected',
+        reference: booking.reference,
+        notificationType,
+        messageId: info.messageId,
+        smtpResponseCode: info.response,
+        errorMessage: 'Recipient rejected by SMTP server.',
+      });
+      return {
+        success: false,
+        recipient: targetRecipient,
+        messageId: info.messageId,
+        errorCode: 'SMTP_REJECTED',
+        errorReason: 'Recipient rejected by SMTP server.',
+      };
+    }
+
+    logSafeEmailDiagnostic({
+      event: 'smtp_accepted',
+      reference: booking.reference,
+      notificationType,
+      messageId: info.messageId,
+      smtpResponseCode: info.response,
     });
 
     return {
@@ -419,11 +687,23 @@ export async function sendCabinApprovalPaymentLink(
       messageId: info.messageId,
     };
   } catch (err: any) {
-    console.error(`[Email Service] Error sending payment link email:`, err);
+    const errInfo = extractSmtpErrorInfo(err);
+    logSafeEmailDiagnostic({
+      event: 'send_failed',
+      reference: booking.reference,
+      notificationType,
+      errorCode: errInfo.errorCode,
+      smtpResponseCode: errInfo.smtpResponseCode,
+      smtpCommand: errInfo.smtpCommand,
+      errorMessage: errInfo.sanitizedMessage,
+    });
     return {
       success: false,
       recipient: targetRecipient,
-      errorReason: err?.message || String(err),
+      errorCode: errInfo.errorCode,
+      smtpResponseCode: errInfo.smtpResponseCode,
+      smtpCommand: errInfo.smtpCommand,
+      errorReason: errInfo.sanitizedMessage,
     };
   }
 }
@@ -434,10 +714,15 @@ export async function sendCabinApprovalPaymentLink(
 export async function sendPaymentConfirmationCustomerEmail(
   booking: BookingRecord
 ): Promise<EmailSendResult> {
+  const notificationType = 'customer_payment_confirmation';
   const targetRecipient = getRecipient(booking.customer.email);
 
   if (!isEmailEnabled()) {
-    console.log(`[Email Service] EMAIL_ENABLED is false. Skipping customer payment confirmation for ${booking.reference}`);
+    logSafeEmailDiagnostic({
+      event: 'disabled_skipped',
+      reference: booking.reference,
+      notificationType,
+    });
     return {
       success: true,
       disabled: true,
@@ -448,9 +733,17 @@ export async function sendPaymentConfirmationCustomerEmail(
 
   const transporter = createTransporter();
   if (!transporter) {
+    logSafeEmailDiagnostic({
+      event: 'send_failed',
+      reference: booking.reference,
+      notificationType,
+      errorCode: 'MISSING_SMTP_CREDENTIALS',
+      errorMessage: 'SMTP_USER or SMTP_APP_PASSWORD not set.',
+    });
     return {
       success: false,
       recipient: targetRecipient,
+      errorCode: 'MISSING_SMTP_CREDENTIALS',
       errorReason: 'MISSING_SMTP_CREDENTIALS: SMTP_USER or SMTP_APP_PASSWORD not set.',
     };
   }
@@ -518,13 +811,45 @@ export async function sendPaymentConfirmationCustomerEmail(
     </html>
   `;
 
+  logSafeEmailDiagnostic({
+    event: 'send_attempt',
+    reference: booking.reference,
+    notificationType,
+  });
+
   try {
-    const smtpUser = process.env.SMTP_USER!;
+    const smtpUser = process.env.SMTP_USER!.trim();
     const info = await transporter.sendMail({
-      from: `"Dubgan San Blas Trips" <${smtpUser.trim()}>`,
+      from: `"Dubgan San Blas Trips" <${smtpUser}>`,
       to: targetRecipient,
       subject,
       html: htmlContent,
+    });
+
+    if (info.rejected && info.rejected.length > 0) {
+      logSafeEmailDiagnostic({
+        event: 'smtp_rejected',
+        reference: booking.reference,
+        notificationType,
+        messageId: info.messageId,
+        smtpResponseCode: info.response,
+        errorMessage: 'Recipient rejected by SMTP server.',
+      });
+      return {
+        success: false,
+        recipient: targetRecipient,
+        messageId: info.messageId,
+        errorCode: 'SMTP_REJECTED',
+        errorReason: 'Recipient rejected by SMTP server.',
+      };
+    }
+
+    logSafeEmailDiagnostic({
+      event: 'smtp_accepted',
+      reference: booking.reference,
+      notificationType,
+      messageId: info.messageId,
+      smtpResponseCode: info.response,
     });
 
     return {
@@ -533,11 +858,23 @@ export async function sendPaymentConfirmationCustomerEmail(
       messageId: info.messageId,
     };
   } catch (err: any) {
-    console.error(`[Email Service] Error sending customer payment confirmation:`, err);
+    const errInfo = extractSmtpErrorInfo(err);
+    logSafeEmailDiagnostic({
+      event: 'send_failed',
+      reference: booking.reference,
+      notificationType,
+      errorCode: errInfo.errorCode,
+      smtpResponseCode: errInfo.smtpResponseCode,
+      smtpCommand: errInfo.smtpCommand,
+      errorMessage: errInfo.sanitizedMessage,
+    });
     return {
       success: false,
       recipient: targetRecipient,
-      errorReason: err?.message || String(err),
+      errorCode: errInfo.errorCode,
+      smtpResponseCode: errInfo.smtpResponseCode,
+      smtpCommand: errInfo.smtpCommand,
+      errorReason: errInfo.sanitizedMessage,
     };
   }
 }
@@ -548,11 +885,16 @@ export async function sendPaymentConfirmationCustomerEmail(
 export async function sendPaymentConfirmationBillyNotification(
   booking: BookingRecord
 ): Promise<EmailSendResult> {
-  const billyEmail = process.env.BOOKING_NOTIFICATION_EMAIL || 'victorinodio17@gmail.com';
+  const notificationType = 'billy_payment_confirmation';
+  const billyEmail = (process.env.BOOKING_NOTIFICATION_EMAIL || 'victorinodio17@gmail.com').trim();
   const targetRecipient = getRecipient(billyEmail);
 
   if (!isEmailEnabled()) {
-    console.log(`[Email Service] EMAIL_ENABLED is false. Skipping Billy payment notification for ${booking.reference}`);
+    logSafeEmailDiagnostic({
+      event: 'disabled_skipped',
+      reference: booking.reference,
+      notificationType,
+    });
     return {
       success: true,
       disabled: true,
@@ -563,14 +905,22 @@ export async function sendPaymentConfirmationBillyNotification(
 
   const transporter = createTransporter();
   if (!transporter) {
+    logSafeEmailDiagnostic({
+      event: 'send_failed',
+      reference: booking.reference,
+      notificationType,
+      errorCode: 'MISSING_SMTP_CREDENTIALS',
+      errorMessage: 'SMTP_USER or SMTP_APP_PASSWORD not set.',
+    });
     return {
       success: false,
       recipient: targetRecipient,
+      errorCode: 'MISSING_SMTP_CREDENTIALS',
       errorReason: 'MISSING_SMTP_CREDENTIALS: SMTP_USER or SMTP_APP_PASSWORD not set.',
     };
   }
 
-  const siteUrl = process.env.SITE_URL || 'https://dubgan.netlify.app';
+  const siteUrl = (process.env.SITE_URL || process.env.URL || 'https://dubgan.netlify.app').trim();
   const adminUrl = `${siteUrl.replace(/\/$/, '')}/admin/bookings`;
   const amountPaid = booking.paymentDetails?.amountPaidUSD || booking.pricing.fullAmountUSD;
 
@@ -615,13 +965,45 @@ export async function sendPaymentConfirmationBillyNotification(
     </html>
   `;
 
+  logSafeEmailDiagnostic({
+    event: 'send_attempt',
+    reference: booking.reference,
+    notificationType,
+  });
+
   try {
-    const smtpUser = process.env.SMTP_USER!;
+    const smtpUser = process.env.SMTP_USER!.trim();
     const info = await transporter.sendMail({
-      from: `"Dubgan San Blas Trips" <${smtpUser.trim()}>`,
+      from: `"Dubgan San Blas Trips" <${smtpUser}>`,
       to: targetRecipient,
       subject: `[PAGO CONFIRMADO] - Ref: ${booking.reference} (${booking.customer.fullName})`,
       html: htmlContent,
+    });
+
+    if (info.rejected && info.rejected.length > 0) {
+      logSafeEmailDiagnostic({
+        event: 'smtp_rejected',
+        reference: booking.reference,
+        notificationType,
+        messageId: info.messageId,
+        smtpResponseCode: info.response,
+        errorMessage: 'Recipient rejected by SMTP server.',
+      });
+      return {
+        success: false,
+        recipient: targetRecipient,
+        messageId: info.messageId,
+        errorCode: 'SMTP_REJECTED',
+        errorReason: 'Recipient rejected by SMTP server.',
+      };
+    }
+
+    logSafeEmailDiagnostic({
+      event: 'smtp_accepted',
+      reference: booking.reference,
+      notificationType,
+      messageId: info.messageId,
+      smtpResponseCode: info.response,
     });
 
     return {
@@ -630,11 +1012,177 @@ export async function sendPaymentConfirmationBillyNotification(
       messageId: info.messageId,
     };
   } catch (err: any) {
-    console.error(`[Email Service] Error sending Billy payment confirmation notification:`, err);
+    const errInfo = extractSmtpErrorInfo(err);
+    logSafeEmailDiagnostic({
+      event: 'send_failed',
+      reference: booking.reference,
+      notificationType,
+      errorCode: errInfo.errorCode,
+      smtpResponseCode: errInfo.smtpResponseCode,
+      smtpCommand: errInfo.smtpCommand,
+      errorMessage: errInfo.sanitizedMessage,
+    });
     return {
       success: false,
       recipient: targetRecipient,
-      errorReason: err?.message || String(err),
+      errorCode: errInfo.errorCode,
+      smtpResponseCode: errInfo.smtpResponseCode,
+      smtpCommand: errInfo.smtpCommand,
+      errorReason: errInfo.sanitizedMessage,
+    };
+  }
+}
+
+/**
+ * Dispatches both Billy's notification and Customer's acknowledgement for a cabin inquiry.
+ * - Only sends notifications that were NOT already accepted by SMTP.
+ * - Awaits both promises (never leaves floating promises).
+ * - Persists outcomes to Netlify Blobs via updateBookingWithETag.
+ * - Failed emails do not invalidate the saved booking.
+ */
+export async function dispatchCabinRequestEmails(
+  booking: BookingRecord,
+  envMode: 'sandbox' | 'production',
+  currentEtag?: string
+): Promise<{
+  billyResult?: EmailSendResult;
+  customerResult?: EmailSendResult;
+  updatedRecord: BookingRecord;
+}> {
+  const currentNotifs = booking.emailNotifications || {};
+  const newLogs: EmailLogEntry[] = [];
+  const nowIso = new Date().toISOString();
+
+  let billyResult: EmailSendResult | undefined;
+  let customerResult: EmailSendResult | undefined;
+
+  // 1. Billy's notification: only send if not already accepted by SMTP
+  const sendBilly = currentNotifs.billyNotificationStatus !== 'sent';
+  // 2. Customer acknowledgement: only send if not already accepted by SMTP
+  const sendCustomer = currentNotifs.customerAcknowledgementStatus !== 'sent';
+
+  if (!sendBilly && !sendCustomer) {
+    return { updatedRecord: booking };
+  }
+
+  // Execute both asynchronously and await both
+  const tasks: Promise<void>[] = [];
+
+  if (sendBilly) {
+    tasks.push(
+      (async () => {
+        try {
+          billyResult = await sendCabinRequestBillyNotification(booking);
+          newLogs.push({
+            type: 'billy_notification',
+            recipient: billyResult.recipient,
+            status: billyResult.disabled ? 'disabled' : billyResult.success ? 'sent' : 'failed',
+            sentAt: nowIso,
+            errorReason: billyResult.errorReason,
+          });
+        } catch (err: any) {
+          const errInfo = extractSmtpErrorInfo(err);
+          billyResult = {
+            success: false,
+            recipient: (process.env.BOOKING_NOTIFICATION_EMAIL || 'victorinodio17@gmail.com').trim(),
+            errorCode: errInfo.errorCode,
+            errorReason: errInfo.sanitizedMessage,
+          };
+          newLogs.push({
+            type: 'billy_notification',
+            recipient: billyResult.recipient,
+            status: 'failed',
+            sentAt: nowIso,
+            errorReason: errInfo.sanitizedMessage,
+          });
+        }
+      })()
+    );
+  }
+
+  if (sendCustomer) {
+    tasks.push(
+      (async () => {
+        try {
+          customerResult = await sendCabinRequestCustomerAcknowledgement(booking);
+          newLogs.push({
+            type: 'customer_acknowledgement',
+            recipient: customerResult.recipient,
+            status: customerResult.disabled ? 'disabled' : customerResult.success ? 'sent' : 'failed',
+            sentAt: nowIso,
+            errorReason: customerResult.errorReason,
+          });
+        } catch (err: any) {
+          const errInfo = extractSmtpErrorInfo(err);
+          customerResult = {
+            success: false,
+            recipient: booking.customer.email,
+            errorCode: errInfo.errorCode,
+            errorReason: errInfo.sanitizedMessage,
+          };
+          newLogs.push({
+            type: 'customer_acknowledgement',
+            recipient: booking.customer.email,
+            status: 'failed',
+            sentAt: nowIso,
+            errorReason: errInfo.sanitizedMessage,
+          });
+        }
+      })()
+    );
+  }
+
+  await Promise.all(tasks);
+
+  // Compute final statuses
+  const billyStatus = billyResult
+    ? (billyResult.disabled ? 'disabled' : billyResult.success ? 'sent' : 'failed')
+    : currentNotifs.billyNotificationStatus;
+
+  const customerStatus = customerResult
+    ? (customerResult.disabled ? 'disabled' : customerResult.success ? 'sent' : 'failed')
+    : currentNotifs.customerAcknowledgementStatus;
+
+  // Persist outcomes into Netlify Blobs storage
+  try {
+    const updateRes = await updateBookingWithETag(
+      booking.reference,
+      envMode,
+      currentEtag,
+      (rec) => {
+        const existingLogs = rec.emailNotifications?.logs || [];
+        return {
+          ...rec,
+          emailNotifications: {
+            ...rec.emailNotifications,
+            ...(billyResult ? { billyNotificationStatus: billyStatus } : {}),
+            ...(customerResult ? { customerAcknowledgementStatus: customerStatus } : {}),
+            logs: [...newLogs, ...existingLogs].slice(0, 20),
+          },
+        };
+      }
+    );
+
+    return {
+      billyResult,
+      customerResult,
+      updatedRecord: updateRes.record || booking,
+    };
+  } catch (storageErr) {
+    console.error('[Email Dispatch] Could not persist email outcome to storage:', storageErr);
+    // Booking was already created and is not invalidated!
+    return {
+      billyResult,
+      customerResult,
+      updatedRecord: {
+        ...booking,
+        emailNotifications: {
+          ...booking.emailNotifications,
+          ...(billyResult ? { billyNotificationStatus: billyStatus } : {}),
+          ...(customerResult ? { customerAcknowledgementStatus: customerStatus } : {}),
+          logs: [...newLogs, ...(booking.emailNotifications?.logs || [])].slice(0, 20),
+        },
+      },
     };
   }
 }

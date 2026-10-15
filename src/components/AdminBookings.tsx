@@ -70,6 +70,20 @@ interface BookingRecord {
     reversalReason?: string;
     status?: string;
   };
+  emailNotifications?: {
+    billyNotificationStatus?: 'sent' | 'failed' | 'disabled' | 'pending';
+    customerAcknowledgementStatus?: 'sent' | 'failed' | 'disabled' | 'pending';
+    customerPaymentLinkStatus?: 'sent' | 'failed' | 'disabled' | 'pending';
+    customerPaymentConfirmationStatus?: 'sent' | 'failed' | 'disabled' | 'pending';
+    billyPaymentConfirmationStatus?: 'sent' | 'failed' | 'disabled' | 'pending';
+    logs?: Array<{
+      type: string;
+      recipient: string;
+      status: 'sent' | 'failed' | 'disabled' | 'pending';
+      sentAt?: string;
+      errorReason?: string;
+    }>;
+  };
   environment: 'sandbox' | 'production';
   createdAt: string;
   updatedAt: string;
@@ -299,6 +313,53 @@ export const AdminBookings: React.FC = () => {
         ref,
         type: 'error',
         text: 'Error de conexión al marcar la reserva como no disponible.',
+      });
+    } finally {
+      setActionLoadingRef(null);
+    }
+  };
+
+  // 6b. Retry Email Notification
+  const handleRetryEmail = async (ref: string, emailType: string) => {
+    setActionLoadingRef(`${ref}_${emailType}`);
+    setActionNotice(null);
+
+    try {
+      const response = await fetch('/api/admin/retry-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference: ref, emailType }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        if (data.skipped) {
+          setActionNotice({
+            ref,
+            type: 'success',
+            text: data.errorEs || 'La notificación ya fue aceptada previamente por SMTP.',
+          });
+        } else {
+          setActionNotice({
+            ref,
+            type: 'success',
+            text: '¡Notificación por correo enviada exitosamente!',
+          });
+        }
+        fetchBookings();
+      } else {
+        setActionNotice({
+          ref,
+          type: 'error',
+          text: data.errorEs || data.message || 'Error al procesar el reintento de correo.',
+        });
+        fetchBookings();
+      }
+    } catch {
+      setActionNotice({
+        ref,
+        type: 'error',
+        text: 'Error de conexión al reintentar el correo.',
       });
     } finally {
       setActionLoadingRef(null);
@@ -967,6 +1028,226 @@ export const AdminBookings: React.FC = () => {
                       </div>
                     </div>
 
+                  </div>
+
+                  {/* Email Notifications Delivery Status & Retry Controls */}
+                  <div className="bg-[#EDE5D7]/50 border border-[#B79A62]/40 p-3 sm:p-4 text-xs space-y-2">
+                    <div className="flex items-center justify-between border-b border-[#B79A62]/20 pb-1.5 flex-wrap gap-2">
+                      <span className="font-bold text-[#102B35] uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
+                        <Mail className="w-3.5 h-3.5 text-[#B79A62]" />
+                        <span>Diagnóstico y Estado de Notificaciones por Correo</span>
+                      </span>
+                      {b.emailNotifications?.logs && b.emailNotifications.logs.length > 0 && (
+                        <span className="text-[10px] font-mono text-[#173642]/70">
+                          Último registro: {new Date(b.emailNotifications.logs[0].sentAt || '').toLocaleTimeString('es-PA')}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-1">
+                      
+                      {/* Billy Notification Status */}
+                      <div className="bg-white p-2.5 border border-[#B79A62]/30 space-y-1.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#B79A62] block">
+                          Notificación a Billy
+                        </span>
+                        <div className="flex items-center justify-between gap-2">
+                          {(() => {
+                            const status = b.emailNotifications?.billyNotificationStatus;
+                            if (status === 'sent') {
+                              return (
+                                <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-bold text-[11px] inline-flex items-center gap-1">
+                                  <Check className="w-3 h-3 text-emerald-600" /> Aceptado por SMTP
+                                </span>
+                              );
+                            }
+                            if (status === 'disabled') {
+                              return (
+                                <span className="text-amber-800 bg-amber-50 px-2 py-0.5 rounded font-medium text-[11px]">
+                                  ⏸️ EMAIL_ENABLED=false
+                                </span>
+                              );
+                            }
+                            if (status === 'failed') {
+                              return (
+                                <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded font-bold text-[11px]">
+                                  ❌ Falló entrega
+                                </span>
+                              );
+                            }
+                            return (
+                              <span className="text-gray-600 bg-gray-100 px-2 py-0.5 rounded text-[11px]">
+                                ⏳ No enviado / Pendiente
+                              </span>
+                            );
+                          })()}
+
+                          <button
+                            type="button"
+                            disabled={
+                              b.emailNotifications?.billyNotificationStatus === 'sent' ||
+                              actionLoadingRef === `${b.reference}_billy_notification`
+                            }
+                            onClick={() => handleRetryEmail(b.reference, 'billy_notification')}
+                            className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-1 min-h-[28px] border cursor-pointer ${
+                              b.emailNotifications?.billyNotificationStatus === 'sent'
+                                ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                                : 'bg-[#B79A62] hover:bg-[#a38752] text-[#173642] border-[#102B35]'
+                            }`}
+                            title={
+                              b.emailNotifications?.billyNotificationStatus === 'sent'
+                                ? 'Ya aceptado por SMTP — reintento prevenido'
+                                : 'Reintentar envío de correo a Billy'
+                            }
+                          >
+                            <RefreshCw
+                              className={`w-3 h-3 ${
+                                actionLoadingRef === `${b.reference}_billy_notification` ? 'animate-spin' : ''
+                              }`}
+                            />
+                            <span>Reintentar</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Customer Acknowledgement Status */}
+                      <div className="bg-white p-2.5 border border-[#B79A62]/30 space-y-1.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#B79A62] block">
+                          Acuse de Recibo al Cliente
+                        </span>
+                        <div className="flex items-center justify-between gap-2">
+                          {(() => {
+                            const status = b.emailNotifications?.customerAcknowledgementStatus;
+                            if (status === 'sent') {
+                              return (
+                                <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-bold text-[11px] inline-flex items-center gap-1">
+                                  <Check className="w-3 h-3 text-emerald-600" /> Aceptado por SMTP
+                                </span>
+                              );
+                            }
+                            if (status === 'disabled') {
+                              return (
+                                <span className="text-amber-800 bg-amber-50 px-2 py-0.5 rounded font-medium text-[11px]">
+                                  ⏸️ EMAIL_ENABLED=false
+                                </span>
+                              );
+                            }
+                            if (status === 'failed') {
+                              return (
+                                <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded font-bold text-[11px]">
+                                  ❌ Falló entrega
+                                </span>
+                              );
+                            }
+                            return (
+                              <span className="text-gray-600 bg-gray-100 px-2 py-0.5 rounded text-[11px]">
+                                ⏳ No enviado / Pendiente
+                              </span>
+                            );
+                          })()}
+
+                          <button
+                            type="button"
+                            disabled={
+                              b.emailNotifications?.customerAcknowledgementStatus === 'sent' ||
+                              actionLoadingRef === `${b.reference}_customer_acknowledgement`
+                            }
+                            onClick={() => handleRetryEmail(b.reference, 'customer_acknowledgement')}
+                            className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-1 min-h-[28px] border cursor-pointer ${
+                              b.emailNotifications?.customerAcknowledgementStatus === 'sent'
+                                ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                                : 'bg-[#B79A62] hover:bg-[#a38752] text-[#173642] border-[#102B35]'
+                            }`}
+                            title={
+                              b.emailNotifications?.customerAcknowledgementStatus === 'sent'
+                                ? 'Ya aceptado por SMTP — reintento prevenido'
+                                : 'Reintentar envío de acuse al cliente'
+                            }
+                          >
+                            <RefreshCw
+                              className={`w-3 h-3 ${
+                                actionLoadingRef === `${b.reference}_customer_acknowledgement` ? 'animate-spin' : ''
+                              }`}
+                            />
+                            <span>Reintentar</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Customer Payment Link Status (For approved cabins) */}
+                      {b.checkoutDetails?.checkoutUrl && (
+                        <div className="bg-white p-2.5 border border-[#B79A62]/30 space-y-1.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#B79A62] block">
+                            Enlace de Pago por Correo
+                          </span>
+                          <div className="flex items-center justify-between gap-2">
+                            {(() => {
+                              const status = b.emailNotifications?.customerPaymentLinkStatus;
+                              if (status === 'sent') {
+                                return (
+                                  <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-bold text-[11px] inline-flex items-center gap-1">
+                                    <Check className="w-3 h-3 text-emerald-600" /> Aceptado por SMTP
+                                  </span>
+                                );
+                              }
+                              if (status === 'disabled') {
+                                return (
+                                  <span className="text-amber-800 bg-amber-50 px-2 py-0.5 rounded font-medium text-[11px]">
+                                    ⏸️ EMAIL_ENABLED=false
+                                  </span>
+                                );
+                              }
+                              if (status === 'failed') {
+                                return (
+                                  <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded font-bold text-[11px]">
+                                    ❌ Falló entrega
+                                  </span>
+                                );
+                              }
+                              return (
+                                <span className="text-gray-600 bg-gray-100 px-2 py-0.5 rounded text-[11px]">
+                                  ⏳ Pendiente
+                                </span>
+                              );
+                            })()}
+
+                            <button
+                              type="button"
+                              disabled={
+                                b.emailNotifications?.customerPaymentLinkStatus === 'sent' ||
+                                actionLoadingRef === `${b.reference}_customer_payment_link`
+                              }
+                              onClick={() => handleRetryEmail(b.reference, 'customer_payment_link')}
+                              className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-1 min-h-[28px] border cursor-pointer ${
+                                b.emailNotifications?.customerPaymentLinkStatus === 'sent'
+                                  ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                                  : 'bg-[#B79A62] hover:bg-[#a38752] text-[#173642] border-[#102B35]'
+                              }`}
+                              title={
+                                b.emailNotifications?.customerPaymentLinkStatus === 'sent'
+                                  ? 'Ya aceptado por SMTP — reintento prevenido'
+                                  : 'Reintentar envío de enlace de pago por correo'
+                              }
+                            >
+                              <RefreshCw
+                                className={`w-3 h-3 ${
+                                  actionLoadingRef === `${b.reference}_customer_payment_link` ? 'animate-spin' : ''
+                                }`}
+                              />
+                              <span>Reintentar</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                    </div>
+
+                    {/* Any Error Details in Log */}
+                    {b.emailNotifications?.logs && b.emailNotifications.logs.length > 0 && b.emailNotifications.logs[0].errorReason && (
+                      <p className="text-[11px] text-red-700 font-mono bg-red-50 p-1.5 border border-red-200 truncate" title={b.emailNotifications.logs[0].errorReason}>
+                        Último error SMTP registrado: {b.emailNotifications.logs[0].errorReason}
+                      </p>
+                    )}
                   </div>
 
                   {/* Individual Booking Action Notice */}

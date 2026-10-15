@@ -5,6 +5,7 @@ import {
   BookingRecord,
 } from './lib/booking-store.js';
 import { validateAndNormalizePhone } from './lib/phone-validator.js';
+import { dispatchCabinRequestEmails } from './lib/email-service.js';
 
 interface CabinPackageRequest {
   tourId: string;
@@ -244,7 +245,22 @@ export default async (req: Request, _context: Context) => {
     );
 
     if (idempotentCheck.found && idempotentCheck.parameterMatch && idempotentCheck.existingRecord) {
-      const existing = idempotentCheck.existingRecord;
+      let existing = idempotentCheck.existingRecord;
+
+      // Duplicate-request check: dispatch notifications if they were never successfully sent
+      try {
+        const dispatchRes = await dispatchCabinRequestEmails(
+          existing,
+          envMode,
+          idempotentCheck.etag
+        );
+        if (dispatchRes.updatedRecord) {
+          existing = dispatchRes.updatedRecord;
+        }
+      } catch (emailErr) {
+        console.error('[Cabin Request Duplicate] Error dispatching pending notifications:', emailErr);
+      }
+
       return new Response(
         JSON.stringify({
           success: true,
@@ -262,6 +278,7 @@ export default async (req: Request, _context: Context) => {
           environment: envMode,
           createdAt: existing.createdAt,
           isReused: true,
+          emailNotifications: existing.emailNotifications,
         }),
         { status: 200, headers }
       );
@@ -316,6 +333,20 @@ export default async (req: Request, _context: Context) => {
       );
     }
 
+    // 8. DISPATCH EMAIL NOTIFICATIONS (AWAITED - NO FLOATING ASYNC PROMISES)
+    // Both Billy's notification and Customer acknowledgement are invoked and awaited.
+    // Outcomes are persisted. Failed emails MUST NOT invalidate the saved booking.
+    let finalRecord = newRecord;
+    try {
+      const emailDispatch = await dispatchCabinRequestEmails(newRecord, envMode);
+      if (emailDispatch.updatedRecord) {
+        finalRecord = emailDispatch.updatedRecord;
+      }
+    } catch (emailErr) {
+      console.error('[Cabin Request] Error in dispatchCabinRequestEmails:', emailErr);
+      // Saved booking remains valid
+    }
+
     // Return successful saved response
     return new Response(
       JSON.stringify({
@@ -333,6 +364,7 @@ export default async (req: Request, _context: Context) => {
         paymentStatus: 'unpaid',
         environment: envMode,
         createdAt: nowIso,
+        emailNotifications: finalRecord.emailNotifications,
       }),
       { status: 200, headers }
     );

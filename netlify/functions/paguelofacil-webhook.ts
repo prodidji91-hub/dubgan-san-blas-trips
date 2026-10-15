@@ -235,7 +235,7 @@ export async function processVerifiedTransaction(
   }
 
   const etagStr: string = etag || '';
-  const paidRes = await updateBookingWithETag(reference, envMode, etagStr, (rec) => ({
+  const paidRes = await updateBookingWithETag(record.reference, envMode, etagStr, (rec) => ({
     ...rec,
     bookingStatus: 'confirmed',
     paymentStatus: 'paid',
@@ -291,7 +291,7 @@ export async function processVerifiedTransaction(
   ];
 
   const etagStr2: string = etag || '';
-  const finalRecord = await updateBookingWithETag(reference, envMode, etagStr2, (rec) => {
+  const finalRecord = await updateBookingWithETag(record.reference, envMode, etagStr2, (rec) => {
     const currentLogs = rec.emailNotifications?.logs || [];
     return {
       ...rec,

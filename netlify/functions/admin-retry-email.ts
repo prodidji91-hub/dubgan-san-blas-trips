@@ -136,6 +136,29 @@ export default async (req: Request, _context: Context) => {
 
     const { record, etag } = metaBooking;
 
+    // Retries must not resend notifications already accepted by SMTP
+    const currentNotificationStatus: Record<string, string | undefined> = {
+      billy_notification: record.emailNotifications?.billyNotificationStatus,
+      customer_acknowledgement: record.emailNotifications?.customerAcknowledgementStatus,
+      customer_payment_link: record.emailNotifications?.customerPaymentLinkStatus,
+      customer_payment_confirmation: record.emailNotifications?.customerPaymentConfirmationStatus,
+      billy_payment_confirmation: record.emailNotifications?.billyPaymentConfirmationStatus,
+    };
+
+    if (currentNotificationStatus[emailType] === 'sent') {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          skipped: true,
+          code: 'ALREADY_ACCEPTED_BY_SMTP',
+          errorEs: 'Esta notificación ya fue aceptada exitosamente por el servidor SMTP y no se reenvía para evitar correos duplicados.',
+          errorEn: 'This notification was already accepted by SMTP and will not be resent.',
+          record,
+        }),
+        { status: 200, headers }
+      );
+    }
+
     let sendResult: EmailSendResult;
 
     if (emailType === 'billy_notification') {

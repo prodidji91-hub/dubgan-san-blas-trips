@@ -5,6 +5,7 @@ import {
   updateBookingWithETag,
   BookingRecord,
 } from './lib/booking-store.js';
+import { sendCabinApprovalPaymentLink } from './lib/email-service.js';
 
 const ALLOWED_HOSTNAMES = [
   'checkout.paguelofacil.com',
@@ -352,6 +353,40 @@ export default async (req: Request, _context: Context) => {
       },
     }));
 
+    let currentRecord = finalUpdate.record;
+
+    // 7. DISPATCH CUSTOMER PAYMENT LINK NOTIFICATION (AWAITED)
+    // Only send if not already accepted by SMTP; failure does not invalidate approved booking.
+    if (currentRecord && currentRecord.emailNotifications?.customerPaymentLinkStatus !== 'sent') {
+      try {
+        const linkRes = await sendCabinApprovalPaymentLink(currentRecord);
+        const nowIso = new Date().toISOString();
+        const linkStatus = linkRes.disabled ? 'disabled' : linkRes.success ? 'sent' : 'failed';
+        const linkUpdate = await updateBookingWithETag(reference, envMode, finalUpdate.newEtag, (rec) => ({
+          ...rec,
+          emailNotifications: {
+            ...rec.emailNotifications,
+            customerPaymentLinkStatus: linkStatus,
+            logs: [
+              {
+                type: 'customer_payment_link' as const,
+                recipient: linkRes.recipient,
+                status: linkStatus as 'sent' | 'failed' | 'disabled' | 'pending',
+                sentAt: nowIso,
+                errorReason: linkRes.errorReason,
+              },
+              ...(rec.emailNotifications?.logs || []),
+            ].slice(0, 20),
+          },
+        }));
+        if (linkUpdate.record) {
+          currentRecord = linkUpdate.record;
+        }
+      } catch (linkErr) {
+        console.error('[Admin Approve] Error dispatching payment link email:', linkErr);
+      }
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -360,7 +395,7 @@ export default async (req: Request, _context: Context) => {
         bookingStatus: 'awaiting_payment',
         paymentStatus: 'unpaid',
         fullAmountUSD: validatedFullAmount,
-        record: finalUpdate.record,
+        record: currentRecord,
       }),
       { status: 200, headers }
     );
