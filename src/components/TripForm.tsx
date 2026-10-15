@@ -388,7 +388,7 @@ export const TripForm: React.FC<TripFormProps> = ({
         ``,
         `👤 *${currentLang === 'es' ? 'Nombre completo' : 'Full Name'}:* ${fullName.trim()}`,
         `📧 *${currentLang === 'es' ? 'Correo electrónico' : 'Email'}:* ${email.trim()}`,
-        `📱 *${currentLang === 'es' ? 'WhatsApp (con código)' : 'WhatsApp (with code)'}:* ${whatsappNumber.trim()}`,
+        `📱 *${currentLang === 'es' ? 'WhatsApp (con código)' : 'WhatsApp (with code)'}:* ${countryCode} ${whatsappLocal}`,
         `🏨 *${currentLang === 'es' ? 'Hotel de recogida' : 'Pickup Hotel'}:* ${hotelText}`,
         message.trim()
           ? `💬 *${currentLang === 'es' ? 'Mensaje / Notas' : 'Message / Notes'}:* ${message.trim()}`

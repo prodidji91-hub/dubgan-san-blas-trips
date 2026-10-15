@@ -363,7 +363,7 @@ export const BookingPage: React.FC<BookingPageProps> = ({
         ``,
         `👤 *${currentLang === 'es' ? 'Nombre completo' : 'Full Name'}:* ${fullName.trim()}`,
         `📧 *${currentLang === 'es' ? 'Correo electrónico' : 'Email'}:* ${email.trim()}`,
-        `📱 *${currentLang === 'es' ? 'WhatsApp' : 'WhatsApp'}:* ${whatsappNumber.trim()}`,
+        `📱 *${currentLang === 'es' ? 'WhatsApp' : 'WhatsApp'}:* ${countryCode} ${whatsappLocal}`,
         `🏨 *${currentLang === 'es' ? 'Hotel de recogida' : 'Pickup Hotel'}:* ${hotelText}`,
         message.trim() ? `💬 *${currentLang === 'es' ? 'Mensaje' : 'Message'}:* ${message.trim()}` : null,
       ]
@@ -862,7 +862,7 @@ export const BookingPage: React.FC<BookingPageProps> = ({
 
                     <div>
                       <p className="text-[#F6F2E9]/60 uppercase tracking-wider text-[10px]">WhatsApp:</p>
-                      <p className="font-bold text-[#F6F2E9]">{whatsappNumber}</p>
+                      <p className="font-bold text-[#F6F2E9]">{countryCode} {whatsappLocal}</p>
                     </div>
 
                     <div className="sm:col-span-2">

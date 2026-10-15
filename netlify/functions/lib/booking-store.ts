@@ -57,7 +57,7 @@ export interface SanitizedWebhookEvent {
   reference?: string;
   receivedAt: string;
   environment: 'sandbox' | 'production';
-  verificationStatus: 'unverified_pending_provider_spec';
+  verificationStatus: 'unverified_pending_provider_spec' | 'verified_via_api' | 'unverified';
 }
 
 export interface EmailLogEntry {
@@ -291,7 +291,7 @@ export async function findExistingIdempotentBooking(
 export async function updateBookingWithETag(
   reference: string,
   envMode: 'sandbox' | 'production',
-  currentETag: string | undefined,
+  currentETag: any,
   updater: (record: BookingRecord) => BookingRecord
 ): Promise<{ success: boolean; modified: boolean; record?: BookingRecord; newEtag?: string }> {
   try {
