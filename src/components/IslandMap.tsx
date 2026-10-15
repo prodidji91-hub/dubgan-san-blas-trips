@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { MapPin, X, ArrowRight, Sparkles, Navigation, Info } from 'lucide-react';
-import { islandData, SAN_BLAS_PORT, IslandStatus } from '../data/islandData';
-import { Language, content } from '../translations/content';
+import { MapPin, X, Sparkles, Navigation, Info } from 'lucide-react';
+import { islandData, SAN_BLAS_PORT, IslandStatus, IslandInfo } from '../data/islandData';
+import { Language } from '../translations/content';
 import { MolaAccent } from './MolaAccent';
-import { MolaBorderDark } from './MolaBorderDark';
 import { images } from '../pictures/images';
 
 interface IslandMapProps {
@@ -110,14 +109,6 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
     }
   };
 
-  const getWhatsAppLink = (islandName: string) => {
-    const message =
-      currentLang === 'es'
-        ? `Hola Dubgan San Blas Trips, me gustaría consultar información y visitas a: ${islandName}.`
-        : `Hello Dubgan San Blas Trips, I would like to inquire about visiting: ${islandName}.`;
-    return `https://wa.me/50764217424?text=${encodeURIComponent(message)}`;
-  };
-
   return (
     <section id="map" className="py-24 bg-[#F6F2E9] text-[#173642] relative overflow-hidden">
       
@@ -162,7 +153,7 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
           <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-[#B79A62] pointer-events-none" />
 
           {/* Interactive SVG Cartographic Canvas */}
-          <div className="relative aspect-[16/9] min-h-[380px] sm:min-h-[460px] md:min-h-[540px] w-full bg-[#0E2833] overflow-hidden select-none shadow-inner border border-[#B79A62]/30">
+          <div className="relative aspect-[16/9] min-h-[400px] sm:min-h-[480px] md:min-h-[580px] w-full bg-[#0E2833] overflow-hidden select-none shadow-inner border border-[#B79A62]/30">
             
             <svg
               viewBox="0 0 1000 560"
@@ -308,6 +299,7 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
 
                 const radius = island.status === 'featured' ? 14 : island.status === 'other' ? 10 : 7;
                 const offset = islandOffsets[island.id] || { dx: 0, dy: 0 };
+                const primaryName = currentLang === 'es' ? island.nameEs : island.nameEn;
 
                 // If island has an assigned photograph, render a beautiful photo thumbnail marker
                 if (imgObj) {
@@ -344,12 +336,12 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                         />
                       )}
 
-                      {/* Visible Rounded Photo Thumbnail via ForeignObject */}
+                      {/* Visible Rounded Photo Thumbnail via ForeignObject with natural wrapping & spacing */}
                       <foreignObject
-                        x={offset.dx - 60}
-                        y={offset.dy - 45}
-                        width="120"
-                        height="90"
+                        x={offset.dx - 80}
+                        y={offset.dy - 50}
+                        width="160"
+                        height="130"
                         className="overflow-visible"
                       >
                         <div
@@ -359,16 +351,16 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                           onClick={() => setSelectedIslandId(island.id)}
                           tabIndex={0}
                           role="button"
-                          aria-label={currentLang === 'es' ? `Isla ${island.nameEs}` : `${island.nameEn} Island`}
+                          aria-label={currentLang === 'es' ? `Isla ${primaryName}` : `${primaryName} Island`}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') {
                               setSelectedIslandId(island.id);
                             }
                           }}
                         >
-                          {/* 48-56px Desktop, 36-44px Mobile Photo Marker with Border and Shadow */}
+                          {/* 40-52px Photo Thumbnail Marker */}
                           <div
-                            className={`w-9 h-9 sm:w-13 sm:h-13 rounded-full overflow-hidden border-2 shadow-md transition-all duration-300 transform group-hover:scale-110 active:scale-95 ${
+                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 shadow-md transition-all duration-300 transform group-hover:scale-110 active:scale-95 ${
                               isSelected ? 'border-[#B79A62] ring-2 ring-[#B79A62]/40 shadow-lg' : 'border-[#F6F2E9]'
                             }`}
                           >
@@ -379,17 +371,24 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                             />
                           </div>
 
-                          {/* Island Name Directly Underneath */}
-                          <span className="text-[9px] sm:text-[10.5px] font-bold font-brand-marcellus text-[#F6F2E9] bg-[#173642]/90 border border-[#B79A62]/20 px-1.5 py-0.5 rounded shadow-sm mt-1 whitespace-nowrap z-10 max-w-[110px] truncate group-hover:border-[#B79A62]/60">
-                            {currentLang === 'es' ? island.nameEs.replace(/\s*\(.*\)/, '') : island.nameEn.replace(/\s*Island\s*/i, '')}
-                          </span>
+                          {/* Island Name & Guna Name with Natural Wrapping (No truncation) */}
+                          <div className="mt-1 bg-[#173642]/95 border border-[#B79A62]/30 px-2 py-1 rounded shadow-sm z-10 max-w-[150px] text-center group-hover:border-[#B79A62]">
+                            <div className="text-[9px] sm:text-[10px] font-bold font-brand-marcellus text-[#F6F2E9] whitespace-normal leading-tight">
+                              {primaryName}
+                            </div>
+                            {island.gunaName && (
+                              <div className="text-[8px] sm:text-[9px] font-normal text-[#B79A62] whitespace-normal leading-tight mt-0.5">
+                                {island.gunaName}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </foreignObject>
                     </g>
                   );
                 }
 
-                // Fallback: render the original beautiful circle dot and text if no photograph exists
+                // Fallback: render dot and text if no photograph exists
                 return (
                   <g
                     key={island.id}
@@ -400,7 +399,6 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                     onMouseLeave={() => setHoveredIslandId(null)}
                     onClick={() => setSelectedIslandId(island.id)}
                   >
-                    {/* Outer Glow Circle for Featured */}
                     {island.status === 'featured' && (
                       <circle
                         cx="0"
@@ -413,7 +411,6 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                       />
                     )}
 
-                    {/* Island Core Shape */}
                     <circle
                       cx="0"
                       cy="0"
@@ -424,7 +421,6 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                       className="transition-all duration-300 transform group-hover:scale-110"
                     />
 
-                    {/* Star Marker for Featured */}
                     {island.status === 'featured' && (
                       <polygon
                         points="0,-4 3,-1 7,-1 4,2 5,6 0,3 -5,6 -4,2 -7,-1 -3,-1"
@@ -432,7 +428,6 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                       />
                     )}
 
-                    {/* Island Name Label */}
                     <text
                       x="0"
                       y={radius + 16}
@@ -443,18 +438,31 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                       fill={isHovered || isSelected ? "#F6F2E9" : island.status === 'inactive' ? "#A4B5BC" : "#B79A62"}
                       className="pointer-events-none transition-colors duration-200 drop-shadow-sm"
                     >
-                      {currentLang === 'es' ? island.nameEs : island.nameEn}
+                      {primaryName}
                     </text>
+                    {island.gunaName && (
+                      <text
+                        x="0"
+                        y={radius + 28}
+                        textAnchor="middle"
+                        fontFamily="'Manrope', sans-serif"
+                        fontSize="9"
+                        fill="#B79A62"
+                        opacity="0.9"
+                      >
+                        {island.gunaName}
+                      </text>
+                    )}
                   </g>
                 );
               })}
 
             </svg>
 
-            {/* Hover Tooltip Overlay */}
+            {/* Hover Tooltip Overlay with Primary & Guna Name */}
             {hoveredIsland && (
               <div
-                className="absolute z-30 pointer-events-none bg-[#F6F2E9] border border-[#B79A62] p-3 shadow-2xl text-xs space-y-1.5 transform -translate-x-1/2 -translate-y-full mb-4 animate-in fade-in duration-150 text-[#173642] w-48"
+                className="absolute z-30 pointer-events-none bg-[#F6F2E9] border border-[#B79A62] p-3 shadow-2xl text-xs space-y-1.5 transform -translate-x-1/2 -translate-y-full mb-4 animate-in fade-in duration-150 text-[#173642] w-52"
                 style={{
                   left: `${(hoveredIsland.cx / 1000) * 100}%`,
                   top: `${(hoveredIsland.cy / 560) * 100}%`,
@@ -473,9 +481,14 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                     </div>
                   );
                 })()}
-                <div className="flex items-center gap-1.5 font-bold text-[#173642]">
-                  <Sparkles className="w-3.5 h-3.5 text-[#B79A62]" />
-                  <span>{currentLang === 'es' ? hoveredIsland.nameEs : hoveredIsland.nameEn}</span>
+                <div className="flex items-start gap-1.5 font-bold text-[#173642]">
+                  <Sparkles className="w-3.5 h-3.5 text-[#B79A62] shrink-0 mt-0.5" />
+                  <div className="flex flex-col">
+                    <span className="leading-tight">{currentLang === 'es' ? hoveredIsland.nameEs : hoveredIsland.nameEn}</span>
+                    {hoveredIsland.gunaName && (
+                      <span className="text-[10px] font-normal text-[#B79A62] mt-0.5">{hoveredIsland.gunaName}</span>
+                    )}
+                  </div>
                 </div>
                 <p className="text-[10px] uppercase font-bold tracking-wider text-[#B79A62]">
                   {currentLang === 'es' ? hoveredIsland.groupEs : hoveredIsland.groupEn}
@@ -548,12 +561,16 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                 onChange={(e) => setSelectedIslandId(e.target.value || null)}
                 className="w-full bg-white text-[#173642] font-bold text-sm border-2 border-[#B79A62] py-3 px-4 pr-8 rounded-none shadow-sm focus:outline-none focus:ring-2 focus:ring-[#B79A62] cursor-pointer"
               >
-                {Object.values(islandData).map((island) => (
-                  <option key={island.id} value={island.id}>
-                    {island.status === 'featured' ? '✨ ' : ''}
-                    {currentLang === 'es' ? island.nameEs : island.nameEn}
-                  </option>
-                ))}
+                {Object.values(islandData).map((island) => {
+                  const primary = currentLang === 'es' ? island.nameEs : island.nameEn;
+                  const displayLabel = island.gunaName ? `${primary} (${island.gunaName})` : primary;
+                  return (
+                    <option key={island.id} value={island.id}>
+                      {island.status === 'featured' ? '✨ ' : ''}
+                      {displayLabel}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           </div>
@@ -568,9 +585,10 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                 <span>{currentLang === 'es' ? 'Seleccionar Isla:' : 'Select Island:'}</span>
               </div>
 
-              <div className="flex flex-col space-y-1.5 max-h-[560px] overflow-y-auto pr-1 scrollbar-thin">
+              <div className="flex flex-col space-y-1.5 max-h-[580px] overflow-y-auto pr-1 scrollbar-thin">
                 {Object.values(islandData).map((island) => {
                   const isSelected = selectedIslandId === island.id;
+                  const primary = currentLang === 'es' ? island.nameEs : island.nameEn;
                   return (
                     <button
                       key={island.id}
@@ -582,10 +600,17 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                           : 'bg-white text-[#173642]/85 border-[#B79A62]/20 hover:border-[#B79A62] hover:bg-[#F6F2E9]'
                       }`}
                     >
-                      <span className="truncate">
-                        {island.status === 'featured' ? '✨ ' : ''}
-                        {currentLang === 'es' ? island.nameEs : island.nameEn}
-                      </span>
+                      <div className="flex flex-col leading-tight">
+                        <span className="font-bold">
+                          {island.status === 'featured' ? '✨ ' : ''}
+                          {primary}
+                        </span>
+                        {island.gunaName && (
+                          <span className={`text-[10px] font-normal mt-0.5 ${isSelected ? 'text-[#102B35]' : 'text-[#B79A62]'}`}>
+                            {island.gunaName}
+                          </span>
+                        )}
+                      </div>
                       {isSelected && <span className="text-xs font-extrabold text-[#173642]">›</span>}
                     </button>
                   );
@@ -617,8 +642,14 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
                         <MolaAccent size="sm" />
                       </div>
 
-                      <h3 className="font-serif-editorial text-3xl sm:text-4xl font-bold text-[#173642]">
-                        {currentLang === 'es' ? selectedIsland.nameEs : selectedIsland.nameEn}
+                      {/* Island Detail Heading with Primary & Guna Name */}
+                      <h3 className="font-serif-editorial text-2xl sm:text-4xl font-bold text-[#173642] flex flex-col">
+                        <span>{currentLang === 'es' ? selectedIsland.nameEs : selectedIsland.nameEn}</span>
+                        {selectedIsland.gunaName && (
+                          <span className="text-lg sm:text-xl font-normal text-[#B79A62] mt-1">
+                            {selectedIsland.gunaName}
+                          </span>
+                        )}
                       </h3>
                     </div>
 
@@ -645,71 +676,83 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
 
                   </div>
 
-                  {/* Island Image with Consistent Moderate Height to Avoid Layout Jumps */}
+                  {/* Island Image */}
                   {selectedIsland.imageKey && (() => {
                     const imgObj = getIslandImageObj(selectedIsland.imageKey);
                     if (!imgObj) return null;
                     return (
-                      <div className="relative aspect-[16/9] max-h-[380px] w-full overflow-hidden border border-[#B79A62]/30 shadow-md bg-[#EDE5D7]">
+                      <div className="relative aspect-[16/9] w-full overflow-hidden border border-[#B79A62]/40 shadow-md bg-[#EDE5D7]">
                         <img
                           src={imgObj.src}
                           alt={currentLang === 'es' ? imgObj.altEs : imgObj.altEn}
-                          className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-[1.02]"
+                          className="w-full h-full object-cover object-center"
                         />
                       </div>
                     );
                   })()}
 
-                  {/* Description Body */}
-                  <p className="text-sm sm:text-base text-[#173642]/90 font-normal leading-relaxed">
-                    {currentLang === 'es' ? selectedIsland.descriptionEs : selectedIsland.descriptionEn}
-                  </p>
-
-                  {/* Activities List */}
+                  {/* Description */}
                   <div className="space-y-2">
-                    <p className="text-xs font-bold uppercase tracking-widest text-[#B79A62]">
-                      {currentLang === 'es' ? 'Actividades y Atractivos:' : 'Activities & Highlights:'}
+                    <p className="text-sm sm:text-base text-[#173642]/90 leading-relaxed font-normal">
+                      {currentLang === 'es' ? selectedIsland.descriptionEs : selectedIsland.descriptionEn}
                     </p>
+                  </div>
 
+                  {/* Activities */}
+                  <div className="space-y-3 pt-2">
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#B79A62]">
+                      {currentLang === 'es' ? 'Actividades Principales' : 'Key Activities'}
+                    </h4>
                     <div className="flex flex-wrap gap-2">
                       {(currentLang === 'es' ? selectedIsland.activitiesEs : selectedIsland.activitiesEn).map(
-                        (act, idx) => (
+                        (activity, idx) => (
                           <span
                             key={idx}
-                            className="bg-white text-[#173642] border border-[#B79A62]/30 px-3 py-1 text-xs font-semibold shadow-xs"
+                            className="bg-white border border-[#B79A62]/40 px-3 py-1.5 text-xs font-semibold text-[#173642] shadow-xs"
                           >
-                            ✓ {act}
+                            {activity}
                           </span>
                         )
                       )}
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="pt-2 flex flex-col sm:flex-row gap-4">
-                    <a
-                      href={getWhatsAppLink(currentLang === 'es' ? selectedIsland.nameEs : selectedIsland.nameEn)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-3 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] px-8 py-3.5 text-xs font-bold uppercase tracking-widest transition-all duration-300 shadow-md"
-                    >
-                      <span>{currentLang === 'es' ? 'CONSULTAR TOUR A ESTA ISLA →' : 'VIEW TOUR / INQUIRE →'}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </a>
+                  {/* Action Footer */}
+                  <div className="pt-4 border-t border-[#B79A62]/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="text-xs text-[#173642]/70 font-medium">
+                      {currentLang === 'es'
+                        ? '¿Deseas visitar este cayo en tu próximo viaje a San Blas?'
+                        : 'Interested in visiting this cay on your San Blas trip?'}
+                    </div>
 
                     <a
-                      href="#tours"
-                      className="inline-flex items-center justify-center gap-2 bg-transparent hover:bg-[#173642]/5 text-[#173642] border border-[#173642]/40 px-6 py-3.5 text-xs font-bold uppercase tracking-widest transition-all duration-300"
+                      href={
+                        selectedIsland.status === 'featured'
+                          ? '#contact'
+                          : `https://wa.me/50764217424?text=${encodeURIComponent(
+                              currentLang === 'es'
+                                ? `Hola Dubgan San Blas Trips, me gustaría consultar una excursión a ${selectedIsland.nameEs}.`
+                                : `Hello Dubgan San Blas Trips, I would like to inquire about a tour to ${selectedIsland.nameEn}.`
+                            )}`
+                      }
+                      className="inline-flex items-center gap-2 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] px-5 py-3 text-xs font-bold uppercase tracking-wider transition-all shadow cursor-pointer min-h-[44px]"
                     >
-                      <Info className="w-4 h-4 text-[#B79A62]" />
-                      <span>{currentLang === 'es' ? 'VER TODOS LOS TOURS' : 'VIEW ALL TOURS'}</span>
+                      <span>{currentLang === 'es' ? 'Consultar sobre este Cayo' : 'Inquire About This Cay'}</span>
                     </a>
                   </div>
 
                 </div>
               ) : (
-                <div className="bg-[#EDE5D7] p-8 text-center text-[#173642]/70 font-medium border border-[#B79A62]/30">
-                  {currentLang === 'es' ? 'Selecciona una isla de la lista para ver su información.' : 'Select an island from the list to view details.'}
+                <div className="bg-[#F6F2E9] border-2 border-[#B79A62] p-12 text-center space-y-3">
+                  <Info className="w-8 h-8 text-[#B79A62] mx-auto" />
+                  <h3 className="font-serif-editorial text-2xl font-bold text-[#173642]">
+                    {currentLang === 'es' ? 'Selecciona un cayo en el mapa' : 'Select a cay on the map'}
+                  </h3>
+                  <p className="text-xs text-[#173642]/70">
+                    {currentLang === 'es'
+                      ? 'Haz clic en cualquiera de los marcadores del mapa superior para ver su información detallada, fotografías y actividades.'
+                      : 'Click any marker on the map above to view its detailed information, photographs, and activities.'}
+                  </p>
                 </div>
               )}
             </div>
@@ -719,12 +762,6 @@ export const IslandMap: React.FC<IslandMapProps> = ({ currentLang }) => {
         </div>
 
       </div>
-
-      {/* Subtle Frame Divider */}
-      <div className="mt-16">
-        <MolaBorderDark />
-      </div>
-
     </section>
   );
 };

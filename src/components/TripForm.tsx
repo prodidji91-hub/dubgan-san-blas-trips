@@ -20,6 +20,7 @@ import {
 import { Language, content } from '../translations/content';
 import { MolaAccent } from './MolaAccent';
 import { MolaBorderDark } from './MolaBorderDark';
+import { COUNTRY_CODES, validateAndFormatWhatsApp } from '../utils/phone';
 
 interface TripFormProps {
   currentLang: Language;
@@ -99,7 +100,8 @@ export const TripForm: React.FC<TripFormProps> = ({
   const [guests, setGuests] = useState<number>(2);
   const [fullName, setFullName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [whatsappNumber, setWhatsappNumber] = useState<string>('');
+  const [countryCode, setCountryCode] = useState<string>('+507');
+  const [whatsappLocal, setWhatsappLocal] = useState<string>('');
   const [pickupHotel, setPickupHotel] = useState<string>('');
   const [notBookedYet, setNotBookedYet] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
@@ -182,7 +184,7 @@ export const TripForm: React.FC<TripFormProps> = ({
   const todayIso = new Date().toISOString().split('T')[0];
 
   // Client-side validations shared by both flows
-  const validateForm = (): boolean => {
+  const validateForm = (): { valid: boolean; normalizedWhatsapp?: string } => {
     setErrorMsg(null);
 
     if (!fullName.trim()) {
@@ -191,7 +193,7 @@ export const TripForm: React.FC<TripFormProps> = ({
           ? 'Por favor ingresa tu nombre y apellido.'
           : 'Please enter your full name.'
       );
-      return false;
+      return { valid: false };
     }
 
     if (!startDate) {
@@ -200,7 +202,7 @@ export const TripForm: React.FC<TripFormProps> = ({
           ? 'Por favor selecciona la fecha de viaje.'
           : 'Please select your travel date.'
       );
-      return false;
+      return { valid: false };
     }
 
     if (!guests || guests < 1) {
@@ -209,7 +211,7 @@ export const TripForm: React.FC<TripFormProps> = ({
           ? 'Por favor indica al menos 1 viajero.'
           : 'Please enter at least 1 guest.'
       );
-      return false;
+      return { valid: false };
     }
 
     if (isPrivate && guests > 3) {
@@ -218,7 +220,7 @@ export const TripForm: React.FC<TripFormProps> = ({
           ? 'El tour privado tiene un límite máximo de 3 personas.'
           : 'The private tour is limited to a maximum of 3 guests.'
       );
-      return false;
+      return { valid: false };
     }
 
     if (!email.trim() || !isValidEmail(email)) {
@@ -227,16 +229,15 @@ export const TripForm: React.FC<TripFormProps> = ({
           ? 'Por favor ingresa un correo electrónico válido.'
           : 'Please enter a valid email address.'
       );
-      return false;
+      return { valid: false };
     }
 
-    if (!whatsappNumber.trim()) {
+    const phoneValidation = validateAndFormatWhatsApp(countryCode, whatsappLocal);
+    if (!phoneValidation.success) {
       setErrorMsg(
-        currentLang === 'es'
-          ? 'Por favor ingresa tu número de WhatsApp con código de país (ej. +507, +1, +34).'
-          : 'Please enter your WhatsApp number with country code (e.g. +1, +507, +34).'
+        currentLang === 'es' ? phoneValidation.errorEs! : phoneValidation.errorEn!
       );
-      return false;
+      return { valid: false };
     }
 
     const hotelText = notBookedYet
@@ -249,10 +250,10 @@ export const TripForm: React.FC<TripFormProps> = ({
           ? 'Por favor indica tu hotel de recogida o marca "Aún no reservado".'
           : 'Please indicate your pickup hotel or check "Not booked yet".'
       );
-      return false;
+      return { valid: false };
     }
 
-    return true;
+    return { valid: true, normalizedWhatsapp: phoneValidation.e164! };
   };
 
   const [isCabinLoading, setIsCabinLoading] = useState<boolean>(false);
@@ -262,7 +263,8 @@ export const TripForm: React.FC<TripFormProps> = ({
     e.preventDefault();
     setCheckoutNotice(null);
 
-    if (!validateForm()) return;
+    const v = validateForm();
+    if (!v.valid) return;
 
     setIsCheckoutLoading(true);
 
@@ -277,7 +279,7 @@ export const TripForm: React.FC<TripFormProps> = ({
         guests,
         fullName: fullName.trim(),
         email: email.trim(),
-        whatsappNumber: whatsappNumber.trim(),
+        whatsappNumber: v.normalizedWhatsapp!,
         pickupHotel: hotelText,
         message: message.trim(),
         language: currentLang,
@@ -326,7 +328,8 @@ export const TripForm: React.FC<TripFormProps> = ({
     e.preventDefault();
     setCheckoutNotice(null);
 
-    if (!validateForm()) return;
+    const v = validateForm();
+    if (!v.valid) return;
 
     setIsCabinLoading(true);
 
@@ -345,7 +348,7 @@ export const TripForm: React.FC<TripFormProps> = ({
         guests,
         fullName: fullName.trim(),
         email: email.trim(),
-        whatsappNumber: whatsappNumber.trim(),
+        whatsappNumber: v.normalizedWhatsapp!,
         pickupHotel: hotelText,
         message: message.trim(),
         language: currentLang,
@@ -413,7 +416,7 @@ export const TripForm: React.FC<TripFormProps> = ({
         rawText: messageLines,
       });
 
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      // Modal data is set, keeping user on page without auto-opening WhatsApp
     } catch (err: any) {
       setErrorMsg(
         currentLang === 'es'
@@ -705,20 +708,33 @@ export const TripForm: React.FC<TripFormProps> = ({
                   />
                 </div>
 
-                {/* WhatsApp with Country Code */}
+                {/* WhatsApp with Country Code Selector */}
                 <div className="space-y-2">
                   <label className="block text-xs font-bold uppercase tracking-widest text-[#B79A62] flex items-center gap-1.5">
                     <Phone className="w-3.5 h-3.5 text-[#B79A62]" />
                     <span>{t.form.phoneLabel} *</span>
                   </label>
-                  <input
-                    type="tel"
-                    required
-                    value={whatsappNumber}
-                    onChange={(e) => setWhatsappNumber(e.target.value)}
-                    placeholder={t.form.phonePlaceholder}
-                    className="w-full px-4 py-3 bg-[#F6F2E9] border border-[#B79A62]/40 text-[#173642] placeholder-[#173642]/40 focus:outline-none focus:border-[#B79A62] text-sm font-medium shadow-xs"
-                  />
+                  <div className="flex gap-2">
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className="px-3 py-3 bg-[#F6F2E9] border border-[#B79A62]/40 text-[#173642] focus:outline-none focus:border-[#B79A62] text-xs sm:text-sm font-medium shadow-xs shrink-0"
+                    >
+                      {COUNTRY_CODES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.code} ({c.country.split(' ')[0]})
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="tel"
+                      required
+                      value={whatsappLocal}
+                      onChange={(e) => setWhatsappLocal(e.target.value)}
+                      placeholder={t.form.phonePlaceholder || "6005-3200"}
+                      className="w-full px-4 py-3 bg-[#F6F2E9] border border-[#B79A62]/40 text-[#173642] placeholder-[#173642]/40 focus:outline-none focus:border-[#B79A62] text-sm font-medium shadow-xs"
+                    />
+                  </div>
                   <p className="text-[10px] text-[#173642]/70 italic">
                     {t.form.phoneHelp}
                   </p>

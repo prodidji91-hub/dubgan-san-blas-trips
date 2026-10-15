@@ -1,5 +1,17 @@
 import nodemailer from 'nodemailer';
+import parsePhoneNumberFromString from 'libphonenumber-js';
 import { BookingRecord } from './booking-store.js';
+
+function renderWhatsAppHtml(rawNumber?: string): string {
+  if (!rawNumber) return 'N/A';
+  const parsed = parsePhoneNumberFromString(rawNumber.trim());
+  if (parsed && parsed.isValid()) {
+    const digits = parsed.number.replace('+', '');
+    const escaped = escapeHtml(rawNumber);
+    return `<a href="https://wa.me/${digits}">${escaped}</a>`;
+  }
+  return `<span style="color: #b91c1c; font-family: monospace;">⚠️ ${escapeHtml(rawNumber)} (Requiere código de país / Corrections needed)</span>`;
+}
 
 export interface EmailSendResult {
   success: boolean;
@@ -120,7 +132,7 @@ export async function sendCabinRequestBillyNotification(
         <ul style="font-size: 13px; padding-left: 20px; color: #173642;">
           <li><strong>Nombre Completo:</strong> ${escapeHtml(booking.customer.fullName)}</li>
           <li><strong>Correo Electrónico:</strong> <a href="mailto:${escapeHtml(booking.customer.email)}">${escapeHtml(booking.customer.email)}</a></li>
-          <li><strong>WhatsApp:</strong> <a href="https://wa.me/${escapeHtml(booking.customer.whatsappNumber.replace(/[^0-9+]/g, ''))}">${escapeHtml(booking.customer.whatsappNumber)}</a></li>
+          <li><strong>WhatsApp:</strong> ${renderWhatsAppHtml(booking.customer.whatsappNumber)}</li>
           <li><strong>Hotel de Recogida:</strong> ${escapeHtml(booking.customer.pickupHotel)}</li>
           ${booking.customer.message ? `<li><strong>Mensaje / Nota:</strong> "${escapeHtml(booking.customer.message)}"</li>` : ''}
         </ul>
@@ -487,7 +499,7 @@ export async function sendPaymentConfirmationCustomerEmail(
         <ul style="font-size: 13px; padding-left: 20px; color: #173642;">
           <li><strong>${isEs ? 'Nombre:' : 'Name:'}</strong> ${escapeHtml(booking.customer.fullName)}</li>
           <li><strong>${isEs ? 'Correo Electrónico:' : 'Email:'}</strong> ${escapeHtml(booking.customer.email)}</li>
-          <li><strong>WhatsApp:</strong> ${escapeHtml(booking.customer.whatsappNumber)}</li>
+          <li><strong>WhatsApp:</strong> ${renderWhatsAppHtml(booking.customer.whatsappNumber)}</li>
         </ul>
 
         <p style="font-size: 13px; color: #173642; margin-top: 25px;">
@@ -588,7 +600,7 @@ export async function sendPaymentConfirmationBillyNotification(
         <ul style="font-size: 13px; padding-left: 20px; color: #173642;">
           <li><strong>Nombre Completo:</strong> ${escapeHtml(booking.customer.fullName)}</li>
           <li><strong>Correo Electrónico:</strong> <a href="mailto:${escapeHtml(booking.customer.email)}">${escapeHtml(booking.customer.email)}</a></li>
-          <li><strong>WhatsApp:</strong> <a href="https://wa.me/${escapeHtml(booking.customer.whatsappNumber.replace(/[^0-9+]/g, ''))}">${escapeHtml(booking.customer.whatsappNumber)}</a></li>
+          <li><strong>WhatsApp:</strong> ${renderWhatsAppHtml(booking.customer.whatsappNumber)}</li>
           <li><strong>Hotel de Recogida:</strong> ${escapeHtml(booking.customer.pickupHotel)}</li>
           ${booking.customer.message ? `<li><strong>Mensaje / Nota:</strong> "${escapeHtml(booking.customer.message)}"</li>` : ''}
         </ul>

@@ -4,6 +4,7 @@ export interface IslandInfo {
   id: string;
   nameEs: string;
   nameEn: string;
+  gunaName?: string;
   status: IslandStatus;
   groupEs: string;
   groupEn: string;
@@ -32,6 +33,7 @@ export const islandData: Record<string, IslandInfo> = {
     id: 'island-dog',
     nameEs: 'Isla Perro Chico (Dog Island)',
     nameEn: 'Dog Island (Isla Perro Chico)',
+    gunaName: 'Assudub Bibbi',
     status: 'featured',
     groupEs: 'Cayos Limón',
     groupEn: 'Limón Cays',
@@ -47,6 +49,7 @@ export const islandData: Record<string, IslandInfo> = {
     id: 'island-pelican',
     nameEs: 'Isla Pelícano',
     nameEn: 'Pelican Island',
+    gunaName: 'Gorgidub',
     status: 'featured',
     groupEs: 'Cayos Limón',
     groupEn: 'Limón Cays',
@@ -62,6 +65,7 @@ export const islandData: Record<string, IslandInfo> = {
     id: 'island-diablo',
     nameEs: 'Isla Diablo',
     nameEn: 'Diablo Island',
+    gunaName: 'Niadub',
     status: 'featured',
     groupEs: 'Cayos Limón',
     groupEn: 'Limón Cays',
@@ -92,6 +96,7 @@ export const islandData: Record<string, IslandInfo> = {
     id: 'island-chichime',
     nameEs: 'Isla Chichime',
     nameEn: 'Chichime Island',
+    gunaName: 'Wissudub',
     status: 'featured',
     groupEs: 'Cayos Chichime',
     groupEn: 'Chichime Cays',
@@ -107,6 +112,7 @@ export const islandData: Record<string, IslandInfo> = {
     id: 'island-aguja',
     nameEs: 'Isla Aguja',
     nameEn: 'Aguja Island',
+    gunaName: 'Iggodub',
     status: 'other',
     groupEs: 'Cayos Cercanos',
     groupEn: 'Near Cays',
@@ -137,6 +143,7 @@ export const islandData: Record<string, IslandInfo> = {
     id: 'island-porvenir',
     nameEs: 'El Porvenir (Guna Administrative Island)',
     nameEn: 'El Porvenir Island',
+    gunaName: 'Gaigirgordub',
     status: 'inactive',
     groupEs: 'Centro Administrativo',
     groupEn: 'Administrative Hub',

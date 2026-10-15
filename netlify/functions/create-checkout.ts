@@ -5,6 +5,7 @@ import {
   updateBookingWithETag,
   BookingRecord,
 } from './lib/booking-store.js';
+import { validateAndNormalizePhone } from './lib/phone-validator.js';
 
 const ALLOWED_HOSTNAMES = [
   'checkout.paguelofacil.com',
@@ -208,17 +209,19 @@ export default async (req: Request, _context: Context) => {
       );
     }
 
-    if (!whatsappNumber || !whatsappNumber.trim()) {
+    const phoneValidation = validateAndNormalizePhone(whatsappNumber);
+    if (!phoneValidation.success) {
       return new Response(
         JSON.stringify({
           success: false,
-          code: 'MISSING_WHATSAPP',
-          errorEs: 'El número de WhatsApp es requerido.',
-          errorEn: 'WhatsApp phone number is required.',
+          code: 'INVALID_WHATSAPP',
+          errorEs: 'El número de WhatsApp no es válido o requiere un código de país válido (ej. +50760053200).',
+          errorEn: 'Invalid WhatsApp phone number or requires a valid country code (e.g. +50760053200).',
         }),
         { status: 400, headers }
       );
     }
+    const normalizedWhatsapp = phoneValidation.e164!;
 
     if (!pickupHotel || !pickupHotel.trim()) {
       return new Response(
@@ -333,7 +336,7 @@ export default async (req: Request, _context: Context) => {
         customer: {
           fullName: fullName.trim(),
           email: email.trim(),
-          whatsappNumber: whatsappNumber.trim(),
+          whatsappNumber: normalizedWhatsapp,
           pickupHotel: pickupHotel.trim(),
           message: message?.trim() || undefined,
         },

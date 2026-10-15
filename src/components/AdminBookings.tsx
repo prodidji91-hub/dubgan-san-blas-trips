@@ -19,12 +19,12 @@ import {
   Loader2,
   Filter,
   ShieldAlert,
-  ChevronRight,
   Check,
   Info,
+  Search,
 } from 'lucide-react';
-import { MolaAccent } from './MolaAccent';
 import { MolaBorderDark } from './MolaBorderDark';
+import { getWhatsAppDisplayInfo } from '../utils/phone';
 
 interface BookingRecord {
   reference: string;
@@ -65,6 +65,11 @@ interface BookingRecord {
     errorReason?: string;
     checkoutState?: 'idle' | 'generating' | 'completed' | 'failed';
   };
+  paymentDetails?: {
+    reversalFlagged?: boolean;
+    reversalReason?: string;
+    status?: string;
+  };
   environment: 'sandbox' | 'production';
   createdAt: string;
   updatedAt: string;
@@ -85,6 +90,11 @@ export const AdminBookings: React.FC = () => {
   const [isLoadingBookings, setIsLoadingBookings] = useState<boolean>(false);
   const [activeFilter, setActiveFilter] = useState<FilterTab>('pending_cabins');
   const [envMode, setEnvMode] = useState<string>('sandbox');
+
+  // Search & Advanced Filters
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [paymentFilter, setPaymentFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   // Approval action state (tracking checkboxes per booking)
   const [checkedAvailability, setCheckedAvailability] = useState<Record<string, boolean>>({});
@@ -304,8 +314,8 @@ export const AdminBookings: React.FC = () => {
 
   // 8. Generate WhatsApp Share URL
   const getWhatsAppShareUrl = (booking: BookingRecord) => {
-    const rawPhone = booking.customer.whatsappNumber.replace(/[^0-9+]/g, '');
-    const phone = rawPhone.startsWith('+') ? rawPhone.slice(1) : rawPhone;
+    const info = getWhatsAppDisplayInfo(booking.customer.whatsappNumber, 'es');
+    const phone = info.valid ? info.waDigits : '';
     const checkoutUrl = booking.checkoutDetails?.checkoutUrl || '';
 
     const textEs = `Hola ${booking.customer.fullName}, ¡Excelentes noticias de Dubgan San Blas Trips! 🌴\n\nHemos verificado la disponibilidad para tu paquete "${booking.tourTitleEs}" (${booking.date} al ${booking.departureDate || booking.date}).\n\nPuedes realizar el pago de $${booking.pricing.fullAmountUSD} USD de forma segura en el siguiente enlace de PagueloFacil:\n${checkoutUrl}\n\nQuedamos atentos a tus comentarios para confirmar tu reserva. ¡Gracias!`;
@@ -313,17 +323,52 @@ export const AdminBookings: React.FC = () => {
     return `https://wa.me/${phone}?text=${encodeURIComponent(textEs)}`;
   };
 
-  // Filter Bookings logic
+  // Overview Summary Statistics (calculated from actual stored booking records)
+  const totalReservations = bookings.length;
+  const newCabinRequests = bookings.filter(
+    (b) => b.category === 'cabin_package' && b.bookingStatus === 'pending_availability'
+  ).length;
+  const dayTripsAwaitingPayment = bookings.filter(
+    (b) => b.category === 'day_trip' && b.bookingStatus === 'awaiting_payment'
+  ).length;
+  const verifiedPaidReservations = bookings.filter(
+    (b) => b.paymentStatus === 'paid'
+  ).length;
+  const cancelledReservations = bookings.filter(
+    (b) => b.bookingStatus === 'cancelled'
+  ).length;
+
+  // Filter & Search Logic
   const filteredBookings = bookings.filter((b) => {
+    // 1. Category / Main Tab Filter
     if (activeFilter === 'pending_cabins') {
-      return b.category === 'cabin_package' && b.bookingStatus === 'pending_availability';
+      if (!(b.category === 'cabin_package' && b.bookingStatus === 'pending_availability')) return false;
+    } else if (activeFilter === 'awaiting_payment') {
+      if (b.bookingStatus !== 'awaiting_payment') return false;
+    } else if (activeFilter === 'day_trips') {
+      if (b.category !== 'day_trip') return false;
     }
-    if (activeFilter === 'awaiting_payment') {
-      return b.bookingStatus === 'awaiting_payment';
+
+    // 2. Payment Status Filter Dropdown
+    if (paymentFilter !== 'all') {
+      if (paymentFilter === 'paid' && b.paymentStatus !== 'paid') return false;
+      if (paymentFilter === 'unpaid' && b.paymentStatus !== 'unpaid') return false;
     }
-    if (activeFilter === 'day_trips') {
-      return b.category === 'day_trip';
+
+    // 3. Booking Status Filter Dropdown
+    if (statusFilter !== 'all') {
+      if (b.bookingStatus !== statusFilter) return false;
     }
+
+    // 4. Search Query (Reference, Customer Name, Email)
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const refMatch = b.reference.toLowerCase().includes(q);
+      const nameMatch = b.customer?.fullName?.toLowerCase().includes(q);
+      const emailMatch = b.customer?.email?.toLowerCase().includes(q);
+      if (!refMatch && !nameMatch && !emailMatch) return false;
+    }
+
     return true;
   });
 
@@ -337,6 +382,32 @@ export const AdminBookings: React.FC = () => {
   ).length;
 
   const countDayTrips = bookings.filter((b) => b.category === 'day_trip').length;
+
+  // Clear Status Label Helpers
+  const getPaymentStatusDisplay = (b: BookingRecord) => {
+    if (b.paymentStatus === 'paid') {
+      return { label: 'Pagado (verificado)', className: 'bg-[#397D80] text-white border-[#397D80]' };
+    }
+    if (b.paymentDetails?.reversalFlagged || b.paymentStatus === 'refunded') {
+      return { label: 'Reembolsado / en revisión', className: 'bg-[#D96848]/20 text-[#D96848] border-[#D96848]' };
+    }
+    return { label: 'No pagado', className: 'bg-[#102B35] text-[#F6F2E9] border-[#102B35]' };
+  };
+
+  const getBookingStatusDisplay = (b: BookingRecord) => {
+    switch (b.bookingStatus) {
+      case 'pending_availability':
+        return { label: 'Pendiente de disponibilidad', className: 'bg-[#B79A62]/20 border-[#B79A62] text-[#173642]' };
+      case 'awaiting_payment':
+        return { label: 'Pendiente de pago', className: 'bg-[#397D80]/20 border-[#397D80] text-[#173642]' };
+      case 'confirmed':
+        return { label: 'Confirmada', className: 'bg-[#397D80] text-white border-[#397D80]' };
+      case 'cancelled':
+        return { label: 'No disponible / cancelada', className: 'bg-[#D96848]/20 border-[#D96848] text-[#D96848]' };
+      default:
+        return { label: b.bookingStatus, className: 'bg-[#EDE5D7] border-[#173642]/30 text-[#173642]' };
+    }
+  };
 
   // LOGIN SCREEN
   if (!isAuthenticated) {
@@ -395,7 +466,7 @@ export const AdminBookings: React.FC = () => {
             <button
               type="submit"
               disabled={isAuthLoading}
-              className="w-full py-3.5 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] font-bold text-xs uppercase tracking-widest transition-all shadow flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] font-bold text-xs uppercase tracking-widest transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
             >
               {isAuthLoading ? (
                 <>
@@ -452,7 +523,7 @@ export const AdminBookings: React.FC = () => {
               type="button"
               onClick={() => fetchBookings()}
               disabled={isLoadingBookings}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#173642] hover:bg-[#397D80] text-[#F6F2E9] border border-[#B79A62]/40 text-xs font-bold uppercase tracking-wider transition-colors shadow"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-[#173642] hover:bg-[#397D80] text-[#F6F2E9] border border-[#B79A62]/40 text-xs font-bold uppercase tracking-wider transition-colors shadow cursor-pointer min-h-[44px]"
               title="Actualizar lista de reservas"
             >
               <RefreshCw className={`w-3.5 h-3.5 text-[#B79A62] ${isLoadingBookings ? 'animate-spin' : ''}`} />
@@ -462,7 +533,7 @@ export const AdminBookings: React.FC = () => {
             <button
               type="button"
               onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#D96848]/20 hover:bg-[#D96848]/40 text-[#F6F2E9] border border-[#D96848]/40 text-xs font-bold uppercase tracking-wider transition-colors shadow"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-[#D96848]/20 hover:bg-[#D96848]/40 text-[#F6F2E9] border border-[#D96848]/40 text-xs font-bold uppercase tracking-wider transition-colors shadow cursor-pointer min-h-[44px]"
             >
               <LogOut className="w-3.5 h-3.5 text-[#D96848]" />
               <span>Cerrar Sesión</span>
@@ -491,88 +562,193 @@ export const AdminBookings: React.FC = () => {
             <button
               type="button"
               onClick={() => setActionNotice(null)}
-              className="text-xs underline font-bold uppercase tracking-wider"
+              className="text-xs underline font-bold uppercase tracking-wider cursor-pointer"
             >
               Cerrar
             </button>
           </div>
         )}
 
-        {/* Filter Navigation Tabs */}
-        <div className="bg-white border border-[#B79A62]/40 p-2 shadow-sm flex flex-wrap items-center justify-between gap-2">
-          
-          <div className="flex flex-wrap items-center gap-2">
+        {/* 1. RESERVATION OVERVIEW SUMMARY (Calculated from actual stored booking records) */}
+        <section aria-labelledby="overview-heading" className="space-y-3">
+          <h2 id="overview-heading" className="sr-only">Resumen General de Reservas</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             
-            {/* Tab 1: Pending Cabins */}
-            <button
-              type="button"
-              onClick={() => setActiveFilter('pending_cabins')}
-              className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
-                activeFilter === 'pending_cabins'
-                  ? 'bg-[#B79A62] text-[#173642] shadow'
-                  : 'bg-[#F6F2E9] text-[#173642]/80 hover:bg-[#EDE5D7]'
-              }`}
-            >
-              <Clock className="w-4 h-4" />
-              <span>Solicitudes de Cabañas</span>
-              <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-[#102B35] text-[#F6F2E9] font-mono">
-                {countPendingCabins}
+            <div className="bg-white p-4 border border-[#B79A62]/40 shadow-xs space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#173642]/70 block">
+                Total Reservas
               </span>
-            </button>
+              <p className="font-serif-editorial text-3xl font-bold text-[#102B35]">
+                {totalReservations}
+              </p>
+            </div>
 
-            {/* Tab 2: Awaiting Payment */}
-            <button
-              type="button"
-              onClick={() => setActiveFilter('awaiting_payment')}
-              className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
-                activeFilter === 'awaiting_payment'
-                  ? 'bg-[#B79A62] text-[#173642] shadow'
-                  : 'bg-[#F6F2E9] text-[#173642]/80 hover:bg-[#EDE5D7]'
-              }`}
-            >
-              <CreditCard className="w-4 h-4" />
-              <span>Por Pagar / Enlace Creado</span>
-              <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-[#102B35] text-[#F6F2E9] font-mono">
-                {countAwaitingPayment}
+            <div className="bg-white p-4 border border-[#B79A62]/40 shadow-xs space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#B79A62] block">
+                Solicitudes Cabaña
               </span>
-            </button>
+              <p className="font-serif-editorial text-3xl font-bold text-[#B79A62]">
+                {newCabinRequests}
+              </p>
+            </div>
 
-            {/* Tab 3: Day Trips */}
-            <button
-              type="button"
-              onClick={() => setActiveFilter('day_trips')}
-              className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
-                activeFilter === 'day_trips'
-                  ? 'bg-[#B79A62] text-[#173642] shadow'
-                  : 'bg-[#F6F2E9] text-[#173642]/80 hover:bg-[#EDE5D7]'
-              }`}
-            >
-              <Calendar className="w-4 h-4" />
-              <span>Pasadías de Un Día</span>
-              <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-[#102B35] text-[#F6F2E9] font-mono">
-                {countDayTrips}
+            <div className="bg-white p-4 border border-[#B79A62]/40 shadow-xs space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#397D80] block">
+                Pasadías por Pagar
               </span>
-            </button>
+              <p className="font-serif-editorial text-3xl font-bold text-[#397D80]">
+                {dayTripsAwaitingPayment}
+              </p>
+            </div>
 
-            {/* Tab 4: All */}
-            <button
-              type="button"
-              onClick={() => setActiveFilter('all')}
-              className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
-                activeFilter === 'all'
-                  ? 'bg-[#173642] text-[#F6F2E9] shadow'
-                  : 'bg-[#F6F2E9] text-[#173642]/80 hover:bg-[#EDE5D7]'
-              }`}
-            >
-              <Filter className="w-4 h-4" />
-              <span>Todas ({bookings.length})</span>
-            </button>
+            <div className="bg-white p-4 border border-[#B79A62]/40 shadow-xs space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#397D80] block">
+                Pagados (Verificados)
+              </span>
+              <p className="font-serif-editorial text-3xl font-bold text-[#397D80]">
+                {verifiedPaidReservations}
+              </p>
+            </div>
+
+            <div className="bg-white p-4 border border-[#B79A62]/40 shadow-xs space-y-1 col-span-2 sm:col-span-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#D96848] block">
+                Canceladas / No Disp.
+              </span>
+              <p className="font-serif-editorial text-3xl font-bold text-[#D96848]">
+                {cancelledReservations}
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* Search, Filter Controls & Category Tabs */}
+        <div className="bg-white border border-[#B79A62]/40 p-4 shadow-sm space-y-4">
+          
+          {/* Row 1: Search input and Dropdown filters */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+            
+            {/* Search Input */}
+            <div className="md:col-span-6 relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#173642]/50">
+                <Search className="w-4 h-4" />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar por referencia, nombre de cliente o email..."
+                className="w-full pl-10 pr-4 py-2.5 bg-[#F6F2E9]/60 border border-[#B79A62]/40 text-[#173642] placeholder-[#173642]/50 text-xs font-medium focus:outline-none focus:border-[#B79A62]"
+              />
+            </div>
+
+            {/* Payment Status Filter Dropdown */}
+            <div className="md:col-span-3">
+              <select
+                value={paymentFilter}
+                onChange={(e) => setPaymentFilter(e.target.value)}
+                className="w-full py-2.5 px-3 bg-[#F6F2E9]/60 border border-[#B79A62]/40 text-[#173642] text-xs font-medium focus:outline-none focus:border-[#B79A62]"
+              >
+                <option value="all">Todos los estados de pago</option>
+                <option value="paid">Pagados (verificados)</option>
+                <option value="unpaid">No pagados / pendientes</option>
+              </select>
+            </div>
+
+            {/* Booking Status Filter Dropdown */}
+            <div className="md:col-span-3">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full py-2.5 px-3 bg-[#F6F2E9]/60 border border-[#B79A62]/40 text-[#173642] text-xs font-medium focus:outline-none focus:border-[#B79A62]"
+              >
+                <option value="all">Todos los estados de reserva</option>
+                <option value="pending_availability">Pendiente de disponibilidad</option>
+                <option value="awaiting_payment">Pendiente de pago</option>
+                <option value="confirmed">Confirmada</option>
+                <option value="cancelled">No disponible / cancelada</option>
+              </select>
+            </div>
 
           </div>
 
-          <span className="text-xs text-[#173642]/60 italic font-mono hidden lg:inline-block pr-2">
-            Base de datos: Netlify Blobs ({envMode})
-          </span>
+          {/* Row 2: Category Filter Tabs */}
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#EDE5D7]">
+            
+            <div className="flex flex-wrap items-center gap-2">
+              
+              {/* Tab 1: Pending Cabins */}
+              <button
+                type="button"
+                onClick={() => setActiveFilter('pending_cabins')}
+                className={`px-3.5 py-2 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer min-h-[40px] ${
+                  activeFilter === 'pending_cabins'
+                    ? 'bg-[#B79A62] text-[#173642] shadow'
+                    : 'bg-[#F6F2E9] text-[#173642]/80 hover:bg-[#EDE5D7]'
+                }`}
+              >
+                <Clock className="w-3.5 h-3.5" />
+                <span>Solicitudes de Cabañas</span>
+                <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-[#102B35] text-[#F6F2E9] font-mono">
+                  {countPendingCabins}
+                </span>
+              </button>
+
+              {/* Tab 2: Awaiting Payment */}
+              <button
+                type="button"
+                onClick={() => setActiveFilter('awaiting_payment')}
+                className={`px-3.5 py-2 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer min-h-[40px] ${
+                  activeFilter === 'awaiting_payment'
+                    ? 'bg-[#B79A62] text-[#173642] shadow'
+                    : 'bg-[#F6F2E9] text-[#173642]/80 hover:bg-[#EDE5D7]'
+                }`}
+              >
+                <CreditCard className="w-3.5 h-3.5" />
+                <span>Por Pagar</span>
+                <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-[#102B35] text-[#F6F2E9] font-mono">
+                  {countAwaitingPayment}
+                </span>
+              </button>
+
+              {/* Tab 3: Day Trips */}
+              <button
+                type="button"
+                onClick={() => setActiveFilter('day_trips')}
+                className={`px-3.5 py-2 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer min-h-[40px] ${
+                  activeFilter === 'day_trips'
+                    ? 'bg-[#B79A62] text-[#173642] shadow'
+                    : 'bg-[#F6F2E9] text-[#173642]/80 hover:bg-[#EDE5D7]'
+                }`}
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Pasadías</span>
+                <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-[#102B35] text-[#F6F2E9] font-mono">
+                  {countDayTrips}
+                </span>
+              </button>
+
+              {/* Tab 4: All */}
+              <button
+                type="button"
+                onClick={() => setActiveFilter('all')}
+                className={`px-3.5 py-2 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer min-h-[40px] ${
+                  activeFilter === 'all'
+                    ? 'bg-[#173642] text-[#F6F2E9] shadow'
+                    : 'bg-[#F6F2E9] text-[#173642]/80 hover:bg-[#EDE5D7]'
+                }`}
+              >
+                <Filter className="w-3.5 h-3.5" />
+                <span>Todas ({filteredBookings.length})</span>
+              </button>
+
+            </div>
+
+            <span className="text-xs text-[#173642]/60 italic font-mono pr-2">
+              Mostrando {filteredBookings.length} de {bookings.length} registros
+            </span>
+
+          </div>
 
         </div>
 
@@ -591,10 +767,10 @@ export const AdminBookings: React.FC = () => {
           <div className="py-16 text-center space-y-3 bg-white border border-[#B79A62]/30 p-8 shadow-xs">
             <Info className="w-8 h-8 text-[#B79A62] mx-auto" />
             <h3 className="font-serif-editorial text-2xl font-bold text-[#173642]">
-              No hay reservas en esta categoría
+              No hay reservas que coincidan con la búsqueda o filtro
             </h3>
             <p className="text-xs text-[#173642]/70 max-w-md mx-auto">
-              Actualmente no existen solicitudes bajo el filtro seleccionado. Selecciona "Todas" para ver el registro completo.
+              Intenta limpiar los filtros de búsqueda o categoría para ver el registro completo.
             </p>
           </div>
         )}
@@ -605,9 +781,11 @@ export const AdminBookings: React.FC = () => {
             {filteredBookings.map((b) => {
               const isPendingCabin =
                 b.category === 'cabin_package' && b.bookingStatus === 'pending_availability';
-              const isAwaitingPayment = b.bookingStatus === 'awaiting_payment';
               const isCancelled = b.bookingStatus === 'cancelled';
               const hasCheckoutUrl = Boolean(b.checkoutDetails?.checkoutUrl);
+
+              const paymentDisplay = getPaymentStatusDisplay(b);
+              const bookingDisplay = getBookingStatusDisplay(b);
 
               return (
                 <div
@@ -646,44 +824,17 @@ export const AdminBookings: React.FC = () => {
                       </h3>
                     </div>
 
-                    {/* Status Badges Lockup */}
+                    {/* Clear Status Labels Lockup */}
                     <div className="flex items-center gap-2 flex-wrap">
                       
-                      {/* Availability Badge */}
-                      <span
-                        className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 border flex items-center gap-1.5 ${
-                          isPendingCabin
-                            ? 'bg-[#B79A62]/20 border-[#B79A62] text-[#173642]'
-                            : isAwaitingPayment
-                            ? 'bg-[#397D80]/20 border-[#397D80] text-[#173642]'
-                            : isCancelled
-                            ? 'bg-[#D96848]/20 border-[#D96848] text-[#D96848]'
-                            : 'bg-[#EDE5D7] border-[#173642]/30 text-[#173642]'
-                        }`}
-                      >
-                        {isPendingCabin && <Clock className="w-3.5 h-3.5 text-[#B79A62]" />}
-                        {isAwaitingPayment && <CheckCircle2 className="w-3.5 h-3.5 text-[#397D80]" />}
-                        {isCancelled && <XCircle className="w-3.5 h-3.5 text-[#D96848]" />}
-                        <span>
-                          {isPendingCabin
-                            ? 'Pendiente Disponibilidad'
-                            : isAwaitingPayment
-                            ? 'Disponibilidad Aprobada / Por Pagar'
-                            : isCancelled
-                            ? 'No Disponible / Cancelado'
-                            : b.bookingStatus}
-                        </span>
+                      {/* Booking Status Badge */}
+                      <span className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 border flex items-center gap-1.5 ${bookingDisplay.className}`}>
+                        <span>{bookingDisplay.label}</span>
                       </span>
 
-                      {/* Payment Badge */}
-                      <span
-                        className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 border ${
-                          b.paymentStatus === 'paid'
-                            ? 'bg-[#397D80] text-white border-[#397D80]'
-                            : 'bg-[#102B35] text-[#F6F2E9] border-[#102B35]'
-                        }`}
-                      >
-                        {b.paymentStatus === 'paid' ? 'PAGADO' : 'NO PAGADO'}
+                      {/* Payment Status Badge */}
+                      <span className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 border ${paymentDisplay.className}`}>
+                        <span>{paymentDisplay.label}</span>
                       </span>
 
                     </div>
@@ -708,7 +859,7 @@ export const AdminBookings: React.FC = () => {
                       {b.departureDate && (
                         <div className="space-y-1 border-b border-[#B79A62]/20 pb-2">
                           <span className="text-[10px] font-bold uppercase tracking-widest text-[#B79A62] block">
-                            Fecha de Salida Calculada ({b.nights} noches)
+                            Fecha de Salida ({b.nights} noches)
                           </span>
                           <div className="font-bold text-[#173642] flex items-center gap-1.5 text-sm">
                             <Calendar className="w-4 h-4 text-[#B79A62]" />
@@ -755,14 +906,26 @@ export const AdminBookings: React.FC = () => {
 
                         <p className="flex items-center gap-2 text-[#173642]/90">
                           <Phone className="w-3.5 h-3.5 text-[#B79A62] shrink-0" />
-                          <a
-                            href={`https://wa.me/${b.customer?.whatsappNumber?.replace(/[^0-9+]/g, '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:underline font-mono font-bold text-[#102B35]"
-                          >
-                            {b.customer?.whatsappNumber}
-                          </a>
+                          {(() => {
+                            const info = getWhatsAppDisplayInfo(b.customer?.whatsappNumber, 'es');
+                            if (info.valid) {
+                              return (
+                                <a
+                                  href={`https://wa.me/${info.waDigits}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="hover:underline font-mono font-bold text-[#102B35]"
+                                >
+                                  {info.display}
+                                </a>
+                              );
+                            }
+                            return (
+                              <span className="text-red-700 font-mono font-semibold bg-red-50 px-2 py-0.5 rounded border border-red-200 inline-flex items-center gap-1.5" title={info.warning || ''}>
+                                ⚠️ {info.display} <span className="text-[10px] text-red-600 font-sans italic">({info.warning})</span>
+                              </span>
+                            );
+                          })()}
                         </p>
 
                         <p className="flex items-center gap-2 text-[#173642]/90 pt-1">
@@ -822,7 +985,7 @@ export const AdminBookings: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setActionNotice(null)}
-                        className="text-xs font-bold underline"
+                        className="text-xs font-bold underline cursor-pointer"
                       >
                         OK
                       </button>
@@ -864,7 +1027,7 @@ export const AdminBookings: React.FC = () => {
                             !checkedAvailability[b.reference] || actionLoadingRef === b.reference
                           }
                           onClick={() => handleApproveCabin(b.reference)}
-                          className={`flex-1 py-3.5 px-4 text-xs font-bold uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 ${
+                          className={`flex-1 py-3.5 px-4 text-xs font-bold uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 min-h-[44px] cursor-pointer ${
                             !checkedAvailability[b.reference] || actionLoadingRef === b.reference
                               ? 'bg-[#EDE5D7] text-[#173642]/40 cursor-not-allowed border border-[#173642]/20'
                               : 'bg-[#B79A62] hover:bg-[#a38752] text-[#173642]'
@@ -887,7 +1050,7 @@ export const AdminBookings: React.FC = () => {
                           type="button"
                           disabled={actionLoadingRef === b.reference}
                           onClick={() => handleDeclineCabin(b.reference)}
-                          className="py-3.5 px-5 bg-transparent hover:bg-[#D96848]/10 text-[#D96848] border border-[#D96848] text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+                          className="py-3.5 px-5 bg-transparent hover:bg-[#D96848]/10 text-[#D96848] border border-[#D96848] text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
                         >
                           <XCircle className="w-4 h-4" />
                           <span>No Disponible</span>
@@ -932,7 +1095,7 @@ export const AdminBookings: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleCopyLink(b.reference, b.checkoutDetails!.checkoutUrl!)}
-                          className="flex-1 py-3 px-4 bg-[#173642] hover:bg-[#397D80] text-[#F6F2E9] border border-[#B79A62]/50 text-xs font-bold uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2"
+                          className="flex-1 py-3 px-4 bg-[#173642] hover:bg-[#397D80] text-[#F6F2E9] border border-[#B79A62]/50 text-xs font-bold uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
                         >
                           {copiedRef === b.reference ? (
                             <>
@@ -952,7 +1115,7 @@ export const AdminBookings: React.FC = () => {
                           href={getWhatsAppShareUrl(b)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 py-3 px-4 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] text-xs font-bold uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2"
+                          className="flex-1 py-3 px-4 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] text-xs font-bold uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
                         >
                           <MessageCircle className="w-4 h-4 fill-[#173642]" />
                           <span>Compartir por WhatsApp</span>
@@ -968,7 +1131,7 @@ export const AdminBookings: React.FC = () => {
                   )}
 
                   {/* RETRY LINK GENERATION IF CHECKOUT FAILED OR MERCH CONFIG MISSING */}
-                  {isAwaitingPayment && !hasCheckoutUrl && (
+                  {b.bookingStatus === 'awaiting_payment' && !hasCheckoutUrl && (
                     <div className="bg-[#D96848]/10 border-2 border-[#D96848] p-4 text-xs space-y-3">
                       <div className="flex items-center gap-2 text-[#D96848] font-bold uppercase tracking-wider">
                         <AlertCircle className="w-4 h-4" />
@@ -988,7 +1151,7 @@ export const AdminBookings: React.FC = () => {
                           setCheckedAvailability({ ...checkedAvailability, [b.reference]: true });
                           handleApproveCabin(b.reference);
                         }}
-                        className="py-2.5 px-4 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-2"
+                        className="py-2.5 px-4 bg-[#B79A62] hover:bg-[#a38752] text-[#173642] font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-2 min-h-[44px] cursor-pointer"
                       >
                         <RefreshCw className={`w-3.5 h-3.5 ${actionLoadingRef === b.reference ? 'animate-spin' : ''}`} />
                         <span>Reintentar Generación de Enlace de Pago</span>

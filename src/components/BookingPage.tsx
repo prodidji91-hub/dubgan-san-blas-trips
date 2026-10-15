@@ -21,6 +21,7 @@ import { Language, content } from '../translations/content';
 import { images } from '../pictures/images';
 import { MolaAccent } from './MolaAccent';
 import { MolaBorderDark } from './MolaBorderDark';
+import { COUNTRY_CODES, validateAndFormatWhatsApp } from '../utils/phone';
 
 interface BookingPageProps {
   currentLang: Language;
@@ -107,7 +108,8 @@ export const BookingPage: React.FC<BookingPageProps> = ({
   const [guests, setGuests] = useState<number>(2);
   const [fullName, setFullName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [whatsappNumber, setWhatsappNumber] = useState<string>('');
+  const [countryCode, setCountryCode] = useState<string>('+507');
+  const [whatsappLocal, setWhatsappLocal] = useState<string>('');
   const [pickupHotel, setPickupHotel] = useState<string>('');
   const [notBookedYet, setNotBookedYet] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
@@ -182,37 +184,38 @@ export const BookingPage: React.FC<BookingPageProps> = ({
 
   const todayIso = new Date().toISOString().split('T')[0];
 
-  const validateForm = (): boolean => {
+  const validateForm = (): { valid: boolean; normalizedWhatsapp?: string } => {
     setErrorMsg(null);
 
     if (!fullName.trim()) {
       setErrorMsg(currentLang === 'es' ? 'Por favor ingresa tu nombre y apellido.' : 'Please enter your full name.');
-      return false;
+      return { valid: false };
     }
 
     if (!startDate) {
       setErrorMsg(currentLang === 'es' ? 'Por favor selecciona la fecha de viaje.' : 'Please select your travel date.');
-      return false;
+      return { valid: false };
     }
 
     if (!guests || guests < 1) {
       setErrorMsg(currentLang === 'es' ? 'Por favor indica al menos 1 viajero.' : 'Please enter at least 1 guest.');
-      return false;
+      return { valid: false };
     }
 
     if (isPrivate && guests > 3) {
       setErrorMsg(currentLang === 'es' ? 'El tour privado tiene un límite máximo de 3 personas.' : 'The private tour is limited to a maximum of 3 guests.');
-      return false;
+      return { valid: false };
     }
 
     if (!email.trim() || !isValidEmail(email)) {
       setErrorMsg(currentLang === 'es' ? 'Por favor ingresa un correo electrónico válido.' : 'Please enter a valid email address.');
-      return false;
+      return { valid: false };
     }
 
-    if (!whatsappNumber.trim()) {
-      setErrorMsg(currentLang === 'es' ? 'Por favor ingresa tu número de WhatsApp con código de país.' : 'Please enter your WhatsApp number with country code.');
-      return false;
+    const phoneValidation = validateAndFormatWhatsApp(countryCode, whatsappLocal);
+    if (!phoneValidation.success) {
+      setErrorMsg(currentLang === 'es' ? phoneValidation.errorEs! : phoneValidation.errorEn!);
+      return { valid: false };
     }
 
     const hotelText = notBookedYet
@@ -221,15 +224,16 @@ export const BookingPage: React.FC<BookingPageProps> = ({
 
     if (!hotelText) {
       setErrorMsg(currentLang === 'es' ? 'Por favor indica tu hotel de recogida o marca "Aún no reservado".' : 'Please indicate your pickup hotel or check "Not booked yet".');
-      return false;
+      return { valid: false };
     }
 
-    return true;
+    return { valid: true, normalizedWhatsapp: phoneValidation.e164! };
   };
 
   const handleProceedToReview = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
+    const v = validateForm();
+    if (v.valid) {
       setStep('review_booking');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -238,7 +242,8 @@ export const BookingPage: React.FC<BookingPageProps> = ({
   // Day Trip Online Checkout Handler
   const handleDayTripCheckout = async () => {
     setCheckoutNotice(null);
-    if (!validateForm()) return;
+    const v = validateForm();
+    if (!v.valid) return;
 
     setIsCheckoutLoading(true);
 
@@ -253,7 +258,7 @@ export const BookingPage: React.FC<BookingPageProps> = ({
         guests,
         fullName: fullName.trim(),
         email: email.trim(),
-        whatsappNumber: whatsappNumber.trim(),
+        whatsappNumber: v.normalizedWhatsapp!,
         pickupHotel: hotelText,
         message: message.trim(),
         language: currentLang,
@@ -298,7 +303,8 @@ export const BookingPage: React.FC<BookingPageProps> = ({
   // Cabin Package Submission Handler
   const handleCabinRequest = async () => {
     setCheckoutNotice(null);
-    if (!validateForm()) return;
+    const v = validateForm();
+    if (!v.valid) return;
 
     setIsCabinLoading(true);
 
@@ -317,7 +323,7 @@ export const BookingPage: React.FC<BookingPageProps> = ({
         guests,
         fullName: fullName.trim(),
         email: email.trim(),
-        whatsappNumber: whatsappNumber.trim(),
+        whatsappNumber: v.normalizedWhatsapp!,
         pickupHotel: hotelText,
         message: message.trim(),
         language: currentLang,
@@ -378,7 +384,7 @@ export const BookingPage: React.FC<BookingPageProps> = ({
         whatsappUrl,
       });
 
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      // Modal data is set, keeping user on page without auto-opening WhatsApp
     } catch {
       setErrorMsg(
         currentLang === 'es'
@@ -719,14 +725,27 @@ export const BookingPage: React.FC<BookingPageProps> = ({
                       <Phone className="w-3.5 h-3.5 text-[#B79A62]" />
                       <span>{t.form.phoneLabel} *</span>
                     </label>
-                    <input
-                      type="tel"
-                      required
-                      value={whatsappNumber}
-                      onChange={(e) => setWhatsappNumber(e.target.value)}
-                      placeholder={t.form.phonePlaceholder}
-                      className="w-full px-4 py-3 bg-[#102B35] border border-[#B79A62] text-[#F6F2E9] placeholder-[#F6F2E9]/40 focus:outline-none focus:ring-1 focus:ring-[#B79A62] text-sm font-medium shadow-xs"
-                    />
+                    <div className="flex gap-2">
+                      <select
+                        value={countryCode}
+                        onChange={(e) => setCountryCode(e.target.value)}
+                        className="px-3 py-3 bg-[#102B35] border border-[#B79A62] text-[#F6F2E9] focus:outline-none focus:ring-1 focus:ring-[#B79A62] text-xs sm:text-sm font-medium shadow-xs shrink-0"
+                      >
+                        {COUNTRY_CODES.map((c) => (
+                          <option key={c.code} value={c.code} className="bg-[#102B35] text-[#F6F2E9]">
+                            {c.code} ({c.country.split(' ')[0]})
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="tel"
+                        required
+                        value={whatsappLocal}
+                        onChange={(e) => setWhatsappLocal(e.target.value)}
+                        placeholder={t.form.phonePlaceholder || "6005-3200"}
+                        className="w-full px-4 py-3 bg-[#102B35] border border-[#B79A62] text-[#F6F2E9] placeholder-[#F6F2E9]/40 focus:outline-none focus:ring-1 focus:ring-[#B79A62] text-sm font-medium shadow-xs"
+                      />
+                    </div>
                     <p className="text-[10px] text-[#F6F2E9]/60 italic">
                       {t.form.phoneHelp}
                     </p>
